@@ -4,31 +4,26 @@ import DashboardLayout from '../../layouts/DashboardLayout.astro';
 import ItemConsignacaoDetalhes from '../../components/consignacao/ItemConsignacaoDetalhes';
 import type { ItemConsignacao, Fornecedor } from '../../types';
 
-// --- Importe os mocks do db.ts ---
-import { mockItensConsignados, mockFornecedores } from '../../lib/db';
-// --- Fim da importação dos mocks ---
+import { getItensConsignados, getFornecedores } from '../../lib/db'; // <-- Importe as funções
 
 // getStaticPaths é necessário para rotas dinâmicas em Astro
 export async function getStaticPaths() {
-  return mockItensConsignados.map(item => ({
+  // --- CHAME A FUNÇÃO ASSÍNCRONA DE FETCH AQUI ---
+  const itens = await getItensConsignados(); // <--- CHAME A FUNÇÃO!
+  // --- FIM DA CHAMADA ---
+
+  return itens.map(item => ({
     params: { id: item.id },
-    props: { item },
+    // props: { item }, // <--- NÃO PRECISA MAIS PASSAR O ITEM COMO PROP
   }));
 }
-
 const { id } = Astro.params;
-const { item } = Astro.props as { item: ItemConsignacao };
-
-const fornecedorDoItem = mockFornecedores.find(f => f.id === item.fornecedorId);
-const fornecedorNome = fornecedorDoItem?.nome || 'Fornecedor Desconhecido';
-
 ---
 
-<DashboardLayout title={`Detalhes do Item ${item.codigoFornecedor}`}>
+<DashboardLayout title={`Detalhes do Item ${id.substring(0, 8)}`}>
   <h1 class="text-3xl font-bold mb-8">
-    Item Consignado: {item.marca || ''} {item.categoria || ''}
+    Item Consignado
   </h1>
-  <p class="text-lg text-gray-600 mb-6">Fornecido por: <a href={`/fornecedores/${item.fornecedorId}`} class="text-blue-600 hover:underline">{fornecedorNome}</a></p>
   
-  <ItemConsignacaoDetalhes client:load item={item} fornecedorNome={fornecedorNome} />
+  <ItemConsignacaoDetalhes client:load itemId={id!} />
 </DashboardLayout>

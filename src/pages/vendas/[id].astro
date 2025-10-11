@@ -1,0 +1,30 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import DetalhesVenda from '../../components/vendas/DetalhesVenda';
+
+// --- IMPORTAR A FUNÇÃO DE FETCH, NÃO O MOCK DIRETO ---
+import { getVendas } from '../../lib/db'; // <-- Importe a função getVendas()
+// --- FIM DA IMPORTAÇÃO ---
+
+// getStaticPaths para gerar páginas para cada venda
+export async function getStaticPaths() {
+  // --- CHAME A FUNÇÃO ASSÍNCRONA DE FETCH AQUI ---
+  const vendas = await getVendas(); // <--- CHAME A FUNÇÃO!
+  // --- FIM DA CHAMADA ---
+
+  return vendas.map(venda => ({
+    params: { id: venda.id },
+    // Opcional: Você poderia passar a venda inteira como prop, mas DetalhesVenda já busca por ID.
+    // props: { venda },
+  }));
+}
+
+const { id } = Astro.params;
+// Se você passou a venda como prop, você a pegaria aqui:
+// const { venda } = Astro.props as { venda: Venda };
+---
+
+<DashboardLayout title={`Detalhes da Venda ${id.substring(0, 8)}`}>
+  {/* DetalhesVenda irá buscar a venda por ID usando useQuery, então não precisa de props aqui */}
+  <DetalhesVenda client:load vendaId={id!} />
+</DashboardLayout>

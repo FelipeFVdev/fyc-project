@@ -1,4 +1,6 @@
 // src/components/garimpo/FormItemGarimpo.tsx
+"use client"; // ESSENCIAL para hooks (useForm, useMutation)
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { itemGarimpoSchema } from "@/lib/validations";
@@ -24,6 +26,13 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { z } from "zod";
+import { toast } from "sonner"; // Import toast for notifications
+import type { ItemGarimpo } from "@/types"; // Importando o tipo
+
+// --- IMPORTAR FUNÇÃO DE MUTAÇÃO E HOOKS DO TANSTACK QUERY ---
+import { addItemGarimpo } from "@/lib/db"; // Função para adicionar item
+import { useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/store";
 
 type FormData = z.infer<typeof itemGarimpoSchema>;
 
@@ -31,10 +40,15 @@ export default function FormItemGarimpo() {
   const form = useForm<FormData>({
     resolver: zodResolver(itemGarimpoSchema),
     defaultValues: {
+      localCompra: "", // Adicionado default vazio
       dataCompra: new Date(),
       custoCompra: 0,
       custosAdicionais: 0,
       margemLucro: 50,
+      marca: "",
+      tamanho: "",
+      categoria: "",
+      descricao: "",
     },
   });
 
@@ -45,25 +59,60 @@ export default function FormItemGarimpo() {
   const custoTotal = custoCompra + custosAdicionais;
   const precoVenda = custoTotal * (1 + margemLucro / 100);
 
+  // --- USEMUTATION PARA ADICIONAR ITEM DE GARIMPO ---
+  const addItemMutation = useMutation(
+    {
+      mutationFn: addItemGarimpo, // A função de fetch que adiciona o item
+      onSuccess: (newItem) => {
+        queryClient.invalidateQueries({ queryKey: ["itensGarimpo"] }); // Invalida a lista de itens de garimpo
+
+        toast.success("Item de Garimpo Cadastrado!", {
+          description: `O item '${newItem.categoria}' de ${newItem.marca} foi adicionado.`,
+        });
+        form.reset({
+          localCompra: "",
+          dataCompra: new Date(),
+          custoCompra: 0,
+          custosAdicionais: 0,
+          margemLucro: 50,
+          marca: "",
+          tamanho: "",
+          categoria: "",
+          descricao: "",
+        }); // Reseta o formulário
+      },
+      onError: (error) => {
+        console.error("Erro ao cadastrar item de garimpo:", error);
+        toast.error("Erro no Cadastro", {
+          description:
+            error.message ||
+            "Não foi possível registrar o item. Tente novamente.",
+        });
+      },
+    },
+    queryClient
+  );
+
+  const isLoadingForm = addItemMutation.isPending; // Estado de carregamento do formulário
+
   async function onSubmit(data: FormData) {
     try {
-      const itemCompleto = {
+      const itemCompleto: ItemGarimpo = {
         ...data,
         id: crypto.randomUUID(),
         precoVenda,
-        status: "disponivel" as const,
+        status: "disponivel", // Type 'as const' não é necessário aqui
         dataEntradaEstoque: new Date(),
       };
 
-      // Aqui você faria a chamada para salvar no backend/database
-      console.log("Item cadastrado:", itemCompleto);
-
-      // Simulando sucesso
-      alert("Item cadastrado com sucesso!");
-      form.reset();
-    } catch (error) {
-      console.error("Erro ao cadastrar:", error);
-      alert("Erro ao cadastrar item");
+      // Chama a mutação para adicionar o item
+      addItemMutation.mutate(itemCompleto);
+    } catch (error: any) {
+      console.error("Erro na preparação do item de garimpo:", error);
+      toast.error("Erro na Preparação", {
+        description:
+          error.message || "Ocorreu um erro ao preparar o item de garimpo.",
+      });
     }
   }
 
@@ -71,7 +120,6 @@ export default function FormItemGarimpo() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Local de Compra */}
           <FormField
             control={form.control}
             name="localCompra"
@@ -79,14 +127,17 @@ export default function FormItemGarimpo() {
               <FormItem>
                 <FormLabel>Local de Compra *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ex: Bazar São Vicente" {...field} />
+                  <Input
+                    placeholder="Ex: Bazar São Vicente"
+                    {...field}
+                    disabled={isLoadingForm}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          {/* Data de Compra */}
           <FormField
             control={form.control}
             name="dataCompra"
@@ -102,6 +153,7 @@ export default function FormItemGarimpo() {
                           "w-full pl-3 text-left font-normal",
                           !field.value && "text-muted-foreground"
                         )}
+                        disabled={isLoadingForm}
                       >
                         {field.value ? (
                           format(field.value, "PPP", { locale: ptBR })
@@ -118,7 +170,9 @@ export default function FormItemGarimpo() {
                       selected={field.value}
                       onSelect={field.onChange}
                       disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
+                        date > new Date() ||
+                        date < new Date("1900-01-01") ||
+                        isLoadingForm
                       }
                       initialFocus
                     />
@@ -129,7 +183,6 @@ export default function FormItemGarimpo() {
             )}
           />
 
-          {/* Custo de Compra */}
           <FormField
             control={form.control}
             name="custoCompra"
@@ -143,6 +196,7 @@ export default function FormItemGarimpo() {
                     placeholder="0.00"
                     {...field}
                     onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                    disabled={isLoadingForm}
                   />
                 </FormControl>
                 <FormMessage />
@@ -150,7 +204,6 @@ export default function FormItemGarimpo() {
             )}
           />
 
-          {/* Custos Adicionais */}
           <FormField
             control={form.control}
             name="custosAdicionais"
@@ -164,6 +217,7 @@ export default function FormItemGarimpo() {
                     placeholder="0.00"
                     {...field}
                     onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                    disabled={isLoadingForm}
                   />
                 </FormControl>
                 <FormMessage />
@@ -171,7 +225,6 @@ export default function FormItemGarimpo() {
             )}
           />
 
-          {/* Margem de Lucro */}
           <FormField
             control={form.control}
             name="margemLucro"
@@ -185,6 +238,7 @@ export default function FormItemGarimpo() {
                     placeholder="50"
                     {...field}
                     onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                    disabled={isLoadingForm}
                   />
                 </FormControl>
                 <FormMessage />
@@ -192,7 +246,6 @@ export default function FormItemGarimpo() {
             )}
           />
 
-          {/* Marca */}
           <FormField
             control={form.control}
             name="marca"
@@ -200,14 +253,17 @@ export default function FormItemGarimpo() {
               <FormItem>
                 <FormLabel>Marca</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ex: Zara, H&M" {...field} />
+                  <Input
+                    placeholder="Ex: Zara, H&M"
+                    {...field}
+                    disabled={isLoadingForm}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          {/* Tamanho */}
           <FormField
             control={form.control}
             name="tamanho"
@@ -215,14 +271,17 @@ export default function FormItemGarimpo() {
               <FormItem>
                 <FormLabel>Tamanho</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ex: P, M, G, 38" {...field} />
+                  <Input
+                    placeholder="Ex: P, M, G, 38"
+                    {...field}
+                    disabled={isLoadingForm}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          {/* Categoria */}
           <FormField
             control={form.control}
             name="categoria"
@@ -230,7 +289,11 @@ export default function FormItemGarimpo() {
               <FormItem>
                 <FormLabel>Categoria</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ex: Vestido, Calça" {...field} />
+                  <Input
+                    placeholder="Ex: Vestido, Calça"
+                    {...field}
+                    disabled={isLoadingForm}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -238,7 +301,6 @@ export default function FormItemGarimpo() {
           />
         </div>
 
-        {/* Descrição */}
         <FormField
           control={form.control}
           name="descricao"
@@ -250,6 +312,7 @@ export default function FormItemGarimpo() {
                   placeholder="Descreva o item..."
                   className="resize-none"
                   {...field}
+                  disabled={isLoadingForm}
                 />
               </FormControl>
               <FormMessage />
@@ -257,7 +320,6 @@ export default function FormItemGarimpo() {
           )}
         />
 
-        {/* Resumo de Preços */}
         <div className="bg-gray-50 p-6 rounded-lg space-y-2">
           <h3 className="font-semibold text-lg mb-4">Resumo de Preços</h3>
           <div className="flex justify-between">
@@ -275,10 +337,15 @@ export default function FormItemGarimpo() {
         </div>
 
         <div className="flex gap-4">
-          <Button type="submit" className="flex-1">
-            Cadastrar Item
+          <Button type="submit" className="flex-1" disabled={isLoadingForm}>
+            {isLoadingForm ? "Cadastrando..." : "Cadastrar Item"}
           </Button>
-          <Button type="button" variant="outline" onClick={() => form.reset()}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => form.reset()}
+            disabled={isLoadingForm}
+          >
             Limpar
           </Button>
         </div>

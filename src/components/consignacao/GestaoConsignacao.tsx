@@ -1,7 +1,6 @@
-// src/components/consignacao/GestaoConsignacao.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import type { ItemConsignacao, Fornecedor } from "@/types";
 import {
   Table,
@@ -26,10 +25,18 @@ import { format, isPast, isBefore, addDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 
-import { mockFornecedores, mockItensConsignados } from "@/lib/db"; // Importação atualizada
+import {
+  getItensConsignados,
+  getFornecedores,
+  updateItemConsignado,
+  deleteItemConsignado, // Assumindo que esta função está no db.ts
+} from "@/lib/db";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/store";
 
 export default function GestaoConsignacao() {
-  const [itens, setItens] = useState<ItemConsignacao[]>(mockItensConsignados);
+  // --- CHAME TODOS OS HOOKS PRIMEIRO (antes de qualquer 'return' condicional) ---
+
   const [busca, setBusca] = useState("");
   const [filtroStatus, setFiltroStatus] = useState<
     | "todos"
@@ -40,55 +47,87 @@ export default function GestaoConsignacao() {
     | "devolvido"
   >("todos");
 
-  const fornecedorMap = React.useMemo(() => {
-    return new Map(mockFornecedores.map((f) => [f.id, f.nome]));
-  }, []);
+  const {
+    data: itens,
+    isLoading: isLoadingItens,
+    isError: isErrorItens,
+  } = useQuery<ItemConsignacao[], Error>(
+    {
+      queryKey: ["itensConsignados"],
+      queryFn: getItensConsignados,
+    },
+    queryClient
+  );
 
-  const itensFiltrados = itens.filter((item) => {
-    const matchBusca =
-      item.marca?.toLowerCase().includes(busca.toLowerCase()) ||
-      item.categoria?.toLowerCase().includes(busca.toLowerCase()) ||
-      item.codigoFornecedor.toLowerCase().includes(busca.toLowerCase()) ||
-      fornecedorMap
-        .get(item.fornecedorId)
-        ?.toLowerCase()
-        .includes(busca.toLowerCase());
+  const {
+    data: fornecedores,
+    isLoading: isLoadingFornecedores,
+    isError: isErrorFornecedores,
+  } = useQuery<Fornecedor[], Error>(
+    {
+      queryKey: ["fornecedores"],
+      queryFn: getFornecedores,
+    },
+    queryClient
+  );
 
-    const isExpiringSoon =
-      isBefore(item.dataExpiracao, addDays(new Date(), 30)) &&
-      !isPast(item.dataExpiracao);
+  // Garantir que 'itens' e 'fornecedores' não são undefined para useMemo e map
+  const actualItens = itens || [];
+  const actualFornecedores = fornecedores || [];
 
-    let matchStatus = true;
-    if (filtroStatus === "disponivel") {
-      matchStatus = item.status === "disponivel" && !isPast(item.dataExpiracao);
-    } else if (filtroStatus === "vendido") {
-      matchStatus = item.status === "vendido";
-    } else if (filtroStatus === "expirado") {
-      matchStatus =
-        isPast(item.dataExpiracao) &&
-        item.status !== "vendido" &&
-        item.status !== "devolvido"; // <--- Ajustado
-    } else if (filtroStatus === "proximo_expiracao") {
-      matchStatus = isExpiringSoon && item.status === "disponivel";
-    } else if (filtroStatus === "devolvido") {
-      // <--- NOVO FILTRO
-      matchStatus = item.status === "devolvido";
-    } else if (filtroStatus !== "todos") {
-      // Catch-all para outros status
-      matchStatus = item.status === filtroStatus;
-    }
+  const fornecedorMap = useMemo(() => {
+    return new Map(actualFornecedores.map((f) => [f.id, f.nome]));
+  }, [actualFornecedores]); // Depende de actualFornecedores
 
-    return matchBusca && matchStatus;
-  });
+  const itensFiltrados = useMemo(() => {
+    // Mover a lógica de filtro para useMemo
+    return actualItens.filter((item) => {
+      const matchBusca =
+        item.marca?.toLowerCase().includes(busca.toLowerCase()) ||
+        item.categoria?.toLowerCase().includes(busca.toLowerCase()) ||
+        item.codigoFornecedor.toLowerCase().includes(busca.toLowerCase()) ||
+        fornecedorMap
+          .get(item.fornecedorId)
+          ?.toLowerCase()
+          .includes(busca.toLowerCase());
+
+      const isExpiringSoon =
+        isBefore(item.dataExpiracao, addDays(new Date(), 30)) &&
+        !isPast(item.dataExpiracao);
+
+      let matchStatus = true;
+      if (filtroStatus === "disponivel") {
+        matchStatus =
+          item.status === "disponivel" && !isPast(item.dataExpiracao);
+      } else if (filtroStatus === "vendido") {
+        matchStatus = item.status === "vendido";
+      } else if (filtroStatus === "expirado") {
+        matchStatus =
+          isPast(item.dataExpiracao) &&
+          item.status !== "vendido" &&
+          item.status !== "devolvido";
+      } else if (filtroStatus === "proximo_expiracao") {
+        matchStatus = isExpiringSoon && item.status === "disponivel";
+      } else if (filtroStatus === "devolvido") {
+        matchStatus = item.status === "devolvido";
+      } else if (filtroStatus !== "todos") {
+        matchStatus = item.status === filtroStatus;
+      }
+
+      return matchBusca && matchStatus;
+    });
+  }, [actualItens, busca, filtroStatus, fornecedorMap]); // Dependências
 
   const getStatusBadgeVariant = (item: ItemConsignacao) => {
     const today = new Date();
-    const isPastDate = isPast(item.dataExpiracao);
+    const isPastDate =
+      format(item.dataExpiracao, "yyyy-MM-dd") < format(today, "yyyy-MM-dd");
     const isSoon =
-      isBefore(item.dataExpiracao, addDays(today, 30)) && !isPastDate;
+      format(item.dataExpiracao, "yyyy-MM-dd") <
+        format(addDays(today, 30), "yyyy-MM-dd") && !isPastDate;
 
     if (item.status === "vendido") return "success";
-    if (item.status === "devolvido") return "info"; // <--- NOVO VARIANT AQUI!
+    if (item.status === "devolvido") return "info";
     if (isPastDate) return "destructive";
     if (isSoon) return "yellow";
     return "default";
@@ -96,38 +135,110 @@ export default function GestaoConsignacao() {
 
   const getStatusText = (item: ItemConsignacao) => {
     const today = new Date();
-    const isPastDate = isPast(item.dataExpiracao);
+    const isPastDate =
+      format(item.dataExpiracao, "yyyy-MM-dd") < format(today, "yyyy-MM-dd");
     const isSoon =
-      isBefore(item.dataExpiracao, addDays(today, 30)) && !isPastDate;
+      format(item.dataExpiracao, "yyyy-MM-dd") <
+        format(addDays(today, 30), "yyyy-MM-dd") && !isPastDate;
 
     if (item.status === "vendido") return "Vendido";
-    if (item.status === "devolvido") return "Devolvido"; // <--- NOVO TEXTO AQUI!
+    if (item.status === "devolvido") return "Devolvido";
     if (isPastDate) return "Expirado";
     if (isSoon) return "Próximo a Expirar";
     return "Disponível";
   };
 
+  const updateItemMutation = useMutation(
+    {
+      mutationFn: updateItemConsignado,
+      onSuccess: (updatedItem) => {
+        queryClient.invalidateQueries({ queryKey: ["itensConsignados"] });
+        queryClient.invalidateQueries({
+          queryKey: ["itemConsignado", updatedItem.id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["fornecedor", updatedItem.fornecedorId],
+        });
+        queryClient.invalidateQueries({ queryKey: ["vendas"] }); // Pode invalidar vendas se mudar o status de um item de venda
+        toast.success("Item Atualizado!", {
+          description: `Item ${updatedItem.codigoFornecedor} marcado como '${updatedItem.status}'.`,
+        });
+      },
+      onError: (error) => {
+        toast.error("Erro na Atualização", {
+          description: error.message || "Não foi possível atualizar o item.",
+        });
+      },
+    },
+    queryClient
+  );
+
+  const deleteItemMutation = useMutation(
+    {
+      mutationFn: deleteItemConsignado,
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["itensConsignados"] });
+        toast.success("Item Excluído!", {
+          description: "O item consignado foi removido.",
+        });
+      },
+      onError: (error) => {
+        toast.error("Erro na Exclusão", {
+          description: error.message || "Não foi possível excluir o item.",
+        });
+      },
+    },
+    queryClient
+  );
+
   const handleAction = (
     itemId: string,
-    action: "marcar_vendido" | "marcar_devolvido"
+    action: "marcar_vendido" | "marcar_devolvido" | "excluir"
   ) => {
-    setItens((prevItens) =>
-      prevItens.map((item) => {
-        if (item.id === itemId) {
-          if (action === "marcar_vendido") {
-            return { ...item, status: "vendido" };
-          }
-          if (action === "marcar_devolvido") {
-            return { ...item, status: "devolvido" }; // <--- NOVO STATUS
-          }
-        }
-        return item;
-      })
-    );
-    toast.success("Item Atualizado!", {
-      description: `Ação realizada para o item ${itemId}.`,
-    });
+    const itemToUpdate = actualItens.find((item) => item.id === itemId); // Usar actualItens
+    if (!itemToUpdate) return;
+
+    if (action === "excluir") {
+      if (
+        window.confirm(
+          `Tem certeza que deseja excluir o item ${itemToUpdate.codigoFornecedor}?`
+        )
+      ) {
+        deleteItemMutation.mutate(itemId);
+      }
+    } else {
+      updateItemMutation.mutate({
+        ...itemToUpdate,
+        status: action === "marcar_vendido" ? "vendido" : "devolvido",
+      });
+    }
   };
+
+  // --- FIM DOS HOOKS ---
+
+  // --- AGORA, AS CONDIÇÕES DE RETORNO PRECOCE (APÓS TODOS OS HOOKS) ---
+  if (isLoadingItens || isLoadingFornecedores) {
+    return (
+      <div className="flex justify-center items-center h-48">
+        <p className="text-xl text-gray-700">
+          Carregando itens e fornecedores...
+        </p>
+      </div>
+    );
+  }
+
+  if (isErrorItens || isErrorFornecedores) {
+    console.error("Erro na busca de dados para GestaoConsignacao:", {
+      isErrorItens,
+      isErrorFornecedores,
+    });
+    return (
+      <div className="text-center py-8 text-red-600">
+        Erro ao carregar dados de consignação.
+      </div>
+    );
+  }
+  // --- FIM DAS CONDIÇÕES DE RETORNO PRECOCE ---
 
   return (
     <div className="space-y-4">
@@ -151,7 +262,12 @@ export default function GestaoConsignacao() {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline">
+            <Button
+              variant="outline"
+              disabled={
+                updateItemMutation.isPending || deleteItemMutation.isPending
+              }
+            >
               <Filter className="mr-2 h-4 w-4" />
               Status:{" "}
               {filtroStatus === "todos"
@@ -163,7 +279,7 @@ export default function GestaoConsignacao() {
                 : filtroStatus === "expirado"
                 ? "Expirado"
                 : filtroStatus === "devolvido"
-                ? "Devolvido" // <--- NOVO TEXTO
+                ? "Devolvido"
                 : "Próximo a Expirar"}
             </Button>
           </DropdownMenuTrigger>
@@ -181,8 +297,6 @@ export default function GestaoConsignacao() {
               Expirado
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setFiltroStatus("devolvido")}>
-              {" "}
-              {/* <--- NOVO ITEM DE FILTRO */}
               Devolvido
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -251,7 +365,14 @@ export default function GestaoConsignacao() {
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          disabled={
+                            updateItemMutation.isPending ||
+                            deleteItemMutation.isPending
+                          }
+                        >
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -265,7 +386,6 @@ export default function GestaoConsignacao() {
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
 
-                        {/* Ações só disponíveis para itens que NÃO ESTÃO vendidos/devolvidos/expirados */}
                         {item.status === "disponivel" &&
                           !isPast(item.dataExpiracao) && (
                             <>
@@ -285,11 +405,15 @@ export default function GestaoConsignacao() {
                               </DropdownMenuItem>
                             </>
                           )}
-                        {item.status !== "devolvido" && ( // Pode ter uma opção de reativar item devolvido ou excluir.
-                          <DropdownMenuItem className="text-red-600">
-                            Excluir
-                          </DropdownMenuItem>
-                        )}
+                        {item.status !== "vendido" &&
+                          item.status !== "expirado" && (
+                            <DropdownMenuItem
+                              onClick={() => handleAction(item.id, "excluir")}
+                              className="text-red-600"
+                            >
+                              Excluir
+                            </DropdownMenuItem>
+                          )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

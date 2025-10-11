@@ -1,7 +1,6 @@
-// src/components/consignacao/ExtratoFornecedor.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import type {
   ExtratoFornecedor,
   Fornecedor,
@@ -23,122 +22,213 @@ import {
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Currency, Package } from "lucide-react";
-import { toast } from "sonner"; // Import toast for notifications
+import { toast } from "sonner";
 
-// --- Importe TODOS os mocks necessários do db.ts ---
+// --- IMPORTAR FUNÇÕES DE FETCH E HOOKS DO TANSTACK QUERY ---
 import {
-  mockFornecedores,
-  mockItensConsignados,
-  mockHistoricoVendas,
+  getFornecedorById, // Para buscar o fornecedor específico
+  getItensConsignados, // Para buscar todos os itens consignados
+  getVendas, // Para buscar todas as vendas (para linkar com histórico)
+  // getPagamentosFornecedor, // Se tivéssemos uma função para pagamentos reais
 } from "@/lib/db";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/store";
 
 interface ExtratoFornecedorProps {
   fornecedorId: string;
 }
 
-// Lógica de cálculo do extrato, agora mais robusta
-const calculateExtrato = (fornecedorId: string): ExtratoFornecedor | null => {
-  const fornecedor = mockFornecedores.find((f) => f.id === fornecedorId);
-  if (!fornecedor) return null;
-
-  const itensVendidosDoFornecedor = mockItensConsignados.filter(
-    (item) => item.fornecedorId === fornecedorId && item.status === "vendido"
+// Lógica de cálculo do extrato, agora para ser usada com os dados reativos do useQuery
+const calculateExtrato = (
+  fornecedor: Fornecedor,
+  allItensConsignados: ItemConsignacao[],
+  allVendas: Venda[]
+  // Poderia receber 'allPagamentosReais' aqui se tivéssemos uma função de fetch para eles
+): ExtratoFornecedor => {
+  const itensVendidosDoFornecedor = allItensConsignados.filter(
+    (item) => item.fornecedorId === fornecedor.id && item.status === "vendido"
   );
 
-  // Simular pagamentos existentes e saldos
-  // Em um app real, `pagamentos` viria de um DB e incluiria histórico de saques/créditos
-  const pagamentosDoFornecedor: PagamentoFornecedor[] = [];
+  // --- Mock de pagamentos (só para este cálculo, não persiste) ---
+  const pagamentosGerados: PagamentoFornecedor[] = [];
 
   let saldoDisponivelCredito = 0;
   let saldoDisponivelDinheiro = 0;
-  let totalDevidoInicial = 0; // O que o fornecedor deveria receber pelos itens vendidos
 
   itensVendidosDoFornecedor.forEach((item) => {
-    const valorCredito = item.precoVenda * 0.5; // 50% para crédito
-    const valorDinheiro = item.precoVenda * 0.4; // 40% para dinheiro
+    const valorCreditoPotencial = item.precoVenda * 0.5; // Exemplo: 50%
+    const valorDinheiroPotencial = item.precoVenda * 0.4; // Exemplo: 40%
 
-    // Adiciona o potencial a ser pago
-    totalDevidoInicial += valorCredito; // Assumimos que o máximo é o de crédito para 'total devido'
-
-    // Aqui, em um app real, você checaria se já houve um pagamento para este item.
-    // Para simplificar o mock, vamos considerar que cada venda gera um crédito potencial,
-    // e os saques/créditos são feitos sobre esse total.
-
-    saldoDisponivelCredito += valorCredito;
-    saldoDisponivelDinheiro += valorDinheiro;
-
-    // Adiciona pagamentos "pendentes" simbólicos para itens vendidos para exemplificar
-    pagamentosDoFornecedor.push(
+    // Adiciona pagamentos pendentes (potenciais) para cada item vendido
+    pagamentosGerados.push(
       {
         id: `pg-credito-${item.id}`,
         fornecedorId: item.fornecedorId,
         vendaId: item.id,
-        valor: valorCredito,
+        valor: valorCreditoPotencial,
         tipo: "credito_loja",
         porcentagem: 50,
         status: "pendente",
+        dataPagamento: new Date(),
       },
       {
         id: `pg-dinheiro-${item.id}`,
         fornecedorId: item.fornecedorId,
         vendaId: item.id,
-        valor: valorDinheiro,
+        valor: valorDinheiroPotencial,
         tipo: "dinheiro",
         porcentagem: 40,
         status: "pendente",
+        dataPagamento: new Date(),
       }
     );
+    saldoDisponivelCredito += valorCreditoPotencial;
+    saldoDisponivelDinheiro += valorDinheiroPotencial;
   });
 
-  // Simular um pagamento já feito (para Maria da Silva, id 'f1', do item 'ic1')
-  if (fornecedorId === "f1") {
-    const pagIC1Credito: PagamentoFornecedor = {
-      id: "p1",
-      fornecedorId: "f1",
-      vendaId: "ic1",
-      valor: mockItensConsignados.find((i) => i.id === "ic1")!.precoVenda * 0.5,
-      tipo: "credito_loja",
-      porcentagem: 50,
-      status: "pago",
-      dataPagamento: new Date("2024-06-10"),
-    };
-    pagamentosDoFornecedor.push(pagIC1Credito);
-    saldoDisponivelCredito -= pagIC1Credito.valor; // Deduz o que já foi pago
+  // --- SIMULAR DEDUÇÕES (pagamentos já feitos ou saques) ---
+  // Exemplo: um pagamento já feito para 'f1' do item 'ic1'
+  if (fornecedor.id === "f1") {
+    const itemIC1 = allItensConsignados.find((i) => i.id === "ic1");
+    if (itemIC1) {
+      const valorPago = itemIC1.precoVenda * 0.5;
+      const pagIC1Credito: PagamentoFornecedor = {
+        id: "p1",
+        fornecedorId: "f1",
+        vendaId: "ic1",
+        valor: valorPago,
+        tipo: "credito_loja",
+        porcentagem: 50,
+        status: "pago",
+        dataPagamento: new Date("2024-06-10"),
+      };
+      // Adicionar se ainda não estiver na lista gerada
+      if (!pagamentosGerados.some((p) => p.id === pagIC1Credito.id)) {
+        pagamentosGerados.push(pagIC1Credito);
+        saldoDisponivelCredito -= valorPago; // Deduzir o valor pago
+      }
+    }
   }
-
-  // Filtrar vendas relevantes para o fornecedor
-  const vendasDoFornecedor = mockHistoricoVendas.filter((venda) =>
-    venda.itens.some((vendaItem) =>
-      itensVendidosDoFornecedor.some(
-        (consignadoItem) => consignadoItem.id === vendaItem.itemId
-      )
-    )
-  );
+  // --- FIM SIMULAÇÃO DE DEDUÇÕES ---
 
   return {
     fornecedor,
     itensVendidos: itensVendidosDoFornecedor,
-    totalDevido: Math.max(0, saldoDisponivelCredito + saldoDisponivelDinheiro), // Total ainda a ser pago
+    totalDevido: Math.max(0, saldoDisponivelCredito + saldoDisponivelDinheiro),
     saldoDisponivelCredito: Math.max(0, saldoDisponivelCredito),
     saldoDisponivelDinheiro: Math.max(0, saldoDisponivelDinheiro),
-    pagamentos: pagamentosDoFornecedor, // Aqui é a lista de pagamentos/créditos gerados
+    pagamentos: pagamentosGerados.sort(
+      (a, b) =>
+        (b.dataPagamento || new Date(0)).getTime() -
+        (a.dataPagamento || new Date(0)).getTime()
+    ),
   };
 };
 
 export default function ExtratoFornecedor({
   fornecedorId,
 }: ExtratoFornecedorProps) {
-  const [extrato, setExtrato] = useState<ExtratoFornecedor | null>(null);
+  // --- BUSCAR O FORNECEDOR ESPECÍFICO ---
+  const {
+    data: fornecedor,
+    isLoading: isLoadingFornecedor,
+    isError: isErrorFornecedor,
+  } = useQuery<Fornecedor | undefined, Error>(
+    {
+      queryKey: ["fornecedor", fornecedorId],
+      queryFn: () => getFornecedorById(fornecedorId),
+      enabled: !!fornecedorId,
+    },
+    queryClient
+  );
 
-  useEffect(() => {
-    setExtrato(calculateExtrato(fornecedorId));
-  }, [fornecedorId]);
+  // --- BUSCAR TODOS OS ITENS CONSIGNADOS ---
+  const {
+    data: allItensConsignados,
+    isLoading: isLoadingItensConsignados,
+    isError: isErrorItensConsignados,
+  } = useQuery<ItemConsignacao[], Error>(
+    {
+      queryKey: ["itensConsignados"],
+      queryFn: getItensConsignados,
+    },
+    queryClient
+  );
+
+  // --- BUSCAR TODAS AS VENDAS (para linkar com histórico de itens) ---
+  const {
+    data: allVendas,
+    isLoading: isLoadingVendas,
+    isError: isErrorVendas,
+  } = useQuery<Venda[], Error>(
+    {
+      queryKey: ["vendas"],
+      queryFn: getVendas,
+    },
+    queryClient
+  );
+
+  // --- Calcular o extrato usando useMemo para reatividade ---
+  const extrato = useMemo(() => {
+    if (fornecedor && allItensConsignados && allVendas) {
+      // Passar os dados carregados pelos useQuery para calculateExtrato
+      return calculateExtrato(fornecedor, allItensConsignados, allVendas);
+    }
+    return null;
+  }, [fornecedor, allItensConsignados, allVendas]); // Dependências
+
+  // --- MUTATION PARA SOLICITAR SAQUE ---
+  const solicitarSaqueMutation = useMutation(
+    {
+      mutationFn: async (vars: {
+        tipo: "dinheiro" | "credito_loja";
+        valor: number;
+      }) => {
+        // Simular a adição de um pagamento de saque no DB (se houvesse um backend)
+        console.log(
+          `Simulando registro de saque no DB: ${vars.tipo}, ${vars.valor}`
+        );
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        // Em um app real, aqui você faria a chamada de API que adiciona o pagamento/saque
+        return {
+          success: true,
+          ...vars,
+          id: crypto.randomUUID(),
+          status: "pendente",
+          dataPagamento: new Date(),
+        }; // Retorna o objeto de saque
+      },
+      onSuccess: (newPayment: any) => {
+        // 'any' temporário para o mock de newPayment
+        // Invalidate queries relevantes para re-calcular o extrato
+        queryClient.invalidateQueries({
+          queryKey: ["fornecedor", fornecedorId],
+        }); // Invalida o fornecedor e seu extrato
+        queryClient.invalidateQueries({
+          queryKey: ["fornecedorExtrato", fornecedorId],
+        }); // Se tivéssemos uma key específica para extrato
+
+        toast.success("Solicitação de Saque Enviada!", {
+          description: `Um saque de R$ ${newPayment.valor.toFixed(2)} (${
+            newPayment.tipo
+          }) foi registrado.`,
+        });
+        // Você pode também fazer um update otimista aqui se quiser, mas invalidar é mais simples para mocks
+      },
+      onError: (error) => {
+        toast.error("Erro no Saque", {
+          description: error.message || "Não foi possível processar o saque.",
+        });
+      },
+    },
+    queryClient
+  );
 
   const handleSolicitarSaque = (
     tipo: "dinheiro" | "credito_loja",
     valor: number
   ) => {
-    if (!extrato) return;
+    if (!extrato) return; // Não deveria acontecer se o extrato já foi exibido
 
     if (valor <= 0) {
       toast.error("Valor inválido", {
@@ -146,7 +236,6 @@ export default function ExtratoFornecedor({
       });
       return;
     }
-
     if (tipo === "dinheiro" && valor > extrato.saldoDisponivelDinheiro) {
       toast.error("Saldo Insuficiente", {
         description: "Valor de saque excede o saldo disponível em dinheiro.",
@@ -161,50 +250,48 @@ export default function ExtratoFornecedor({
       return;
     }
 
-    console.log(
-      `Solicitação de saque: Fornecedor ${fornecedorId}, Tipo: ${tipo}, Valor: ${valor}`
-    );
-    toast.success("Solicitação de Saque Enviada!", {
-      description: `Um saque de R$ ${valor.toFixed(
-        2
-      )} (${tipo}) foi solicitado para ${extrato.fornecedor.nome}.`,
-    });
-
-    setExtrato((prevExtrato) => {
-      if (!prevExtrato) return null;
-      return {
-        ...prevExtrato,
-        saldoDisponivelDinheiro:
-          tipo === "dinheiro"
-            ? prevExtrato.saldoDisponivelDinheiro - valor
-            : prevExtrato.saldoDisponivelDinheiro,
-        saldoDisponivelCredito:
-          tipo === "credito_loja"
-            ? prevExtrato.saldoDisponivelCredito - valor
-            : prevExtrato.saldoDisponivelCredito,
-        pagamentos: [
-          ...prevExtrato.pagamentos,
-          {
-            id: crypto.randomUUID(),
-            fornecedorId: fornecedorId,
-            vendaId: `saque-${crypto.randomUUID()}`,
-            valor: valor,
-            tipo: tipo,
-            porcentagem: 0,
-            status: "pendente",
-            dataPagamento: new Date(),
-          },
-        ],
-      };
-    });
+    solicitarSaqueMutation.mutate({ tipo, valor });
   };
 
-  if (!extrato) {
+  // --- LÓGICA DE CARREGAMENTO GLOBAL ---
+  if (
+    isLoadingFornecedor ||
+    isLoadingItensConsignados ||
+    isLoadingVendas ||
+    solicitarSaqueMutation.isPending
+  ) {
+    return (
+      <div className="flex justify-center items-center h-48">
+        <p className="text-xl text-gray-700">
+          Carregando extrato do fornecedor...
+        </p>
+      </div>
+    );
+  }
+
+  // --- LÓGICA DE ERRO OU DADOS NÃO ENCONTRADOS ---
+  if (
+    isErrorFornecedor ||
+    isErrorItensConsignados ||
+    isErrorVendas ||
+    !fornecedor ||
+    !extrato
+  ) {
+    console.error("Erro na busca de dados para ExtratoFornecedor:", {
+      isErrorFornecedor,
+      isErrorItensConsignados,
+      isErrorVendas,
+      fornecedorExists: !!fornecedor,
+      extratoExists: !!extrato,
+    });
     return (
       <div className="text-center py-10">
-        <h1 className="text-3xl font-bold mb-4">Extrato não encontrado.</h1>
+        <h1 className="text-3xl font-bold mb-4">
+          Extrato não encontrado ou erro.
+        </h1>
         <p className="text-lg text-gray-600">
-          Verifique o ID do fornecedor ou tente novamente.
+          Não foi possível carregar o extrato do fornecedor. Verifique o ID ou
+          tente novamente.
         </p>
         <Button
           onClick={() => (window.location.href = "/fornecedores")}
@@ -248,6 +335,7 @@ export default function ExtratoFornecedor({
                     extrato.saldoDisponivelCredito
                   )
                 }
+                disabled={solicitarSaqueMutation.isPending}
               >
                 Usar Crédito
               </Button>
@@ -280,6 +368,7 @@ export default function ExtratoFornecedor({
                     extrato.saldoDisponivelDinheiro
                   )
                 }
+                disabled={solicitarSaqueMutation.isPending}
               >
                 Solicitar Saque
               </Button>
@@ -292,7 +381,6 @@ export default function ExtratoFornecedor({
             <CardTitle className="text-sm font-medium">
               Itens Vendidos (para este fornecedor)
             </CardTitle>
-            {/* O ícone TableHead aqui não faz sentido, mudei para Package */}
             <Package className="h-4 w-4 text-gray-500" />
           </CardHeader>
           <CardContent>
@@ -338,7 +426,7 @@ export default function ExtratoFornecedor({
                 extrato.itensVendidos.map((item) => {
                   const valorCredito = (item.precoVenda * 0.5).toFixed(2);
                   const valorDinheiro = (item.precoVenda * 0.4).toFixed(2);
-                  const vendaAssociada = mockHistoricoVendas.find((v) =>
+                  const vendaAssociada = (allVendas || []).find((v) =>
                     v.itens.some(
                       (i) => i.itemId === item.id && i.tipo === "consignacao"
                     )
@@ -415,8 +503,6 @@ export default function ExtratoFornecedor({
                           pagamento.status === "pago" ? "success" : "secondary"
                         }
                       >
-                        {" "}
-                        {/* Mudei para success */}
                         {pagamento.status === "pago" ? "Pago" : "Pendente"}
                       </Badge>
                     </TableCell>
@@ -425,8 +511,7 @@ export default function ExtratoFornecedor({
                         ? format(pagamento.dataPagamento, "dd/MM/yyyy", {
                             locale: ptBR,
                           })
-                        : "Pendente"}{" "}
-                      {/* Mudei para Pendente */}
+                        : "Pendente"}
                     </TableCell>
                   </TableRow>
                 ))

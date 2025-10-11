@@ -17,18 +17,38 @@ import type { Fornecedor } from "@/types"; // Importação type-only
 // Importar o DialogEditarFornecedor
 import DialogEditarFornecedor from "./DialogEditarFornecedor";
 
+// --- IMPORTAR HOOKS DO TANSTACK QUERY E FUNÇÕES DE MUTAÇÃO ---
+import { useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/store";
+import { deleteFornecedor, updateFornecedor } from "@/lib/db"; // Funções de atualização e exclusão
+import { toast } from "sonner";
+
 interface FornecedorAcoesProps {
   fornecedor: Fornecedor;
-  onFornecedorUpdated: (updatedFornecedor: Fornecedor) => void;
-  onFornecedorDeleted: (fornecedorId: string) => void; // Callback para exclusão
 }
 
-export default function FornecedorAcoes({
-  fornecedor,
-  onFornecedorUpdated,
-  onFornecedorDeleted,
-}: FornecedorAcoesProps) {
+export default function FornecedorAcoes({ fornecedor }: FornecedorAcoesProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  // --- USEMUTATION PARA DELETAR FORNECEDOR ---
+  const deleteMutation = useMutation(
+    {
+      mutationFn: deleteFornecedor,
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["fornecedores"] }); // Invalida a lista de fornecedores
+        toast.success("Fornecedor Excluído!", {
+          description: `O fornecedor ${fornecedor.nome} foi removido.`,
+        });
+      },
+      onError: (error) => {
+        toast.error("Erro na Exclusão", {
+          description:
+            error.message || "Não foi possível excluir o fornecedor.",
+        });
+      },
+    },
+    queryClient
+  );
 
   const handleDelete = () => {
     if (
@@ -36,17 +56,36 @@ export default function FornecedorAcoes({
         `Tem certeza que deseja excluir o fornecedor ${fornecedor.nome}?`
       )
     ) {
-      // Simular exclusão
-      console.log(`Excluindo fornecedor ${fornecedor.id}`);
-      onFornecedorDeleted(fornecedor.id);
-      // Em um app real, faria a chamada de API aqui e, se sucesso, chamaria onFornecedorDeleted
+      deleteMutation.mutate(fornecedor.id); // Chama a mutação de exclusão
     }
   };
 
-  // Callback que será passado para o DialogEditarFornecedor
+  // --- USEMUTATION PARA ATUALIZAR FORNECEDOR ---
+  const updateMutation = useMutation(
+    {
+      mutationFn: updateFornecedor,
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["fornecedores"] }); // Invalida a lista de fornecedores
+        queryClient.invalidateQueries({
+          queryKey: ["fornecedor", fornecedor.id],
+        }); // Invalida o perfil individual
+        toast.success("Fornecedor Atualizado!", {
+          description: `As informações de ${fornecedor.nome} foram salvas.`,
+        });
+      },
+      onError: (error) => {
+        toast.error("Erro na Atualização", {
+          description:
+            error.message || "Não foi possível atualizar o fornecedor.",
+        });
+      },
+    },
+    queryClient
+  );
+
   const handleUpdate = (updatedFornecedor: Fornecedor) => {
-    onFornecedorUpdated(updatedFornecedor);
-    setIsEditDialogOpen(false); // Fechar o dialog após a atualização
+    updateMutation.mutate(updatedFornecedor); // Chama a mutação de atualização
+    setIsEditDialogOpen(false);
   };
 
   return (
@@ -69,7 +108,7 @@ export default function FornecedorAcoes({
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() =>
-              (window.location.href = `/consignacao/extrato/${fornecedor.id}`)
+              (window.location.href = `/fornecedores/extrato/${fornecedor.id}`)
             }
           >
             Ver Extrato

@@ -1,5 +1,4 @@
 ---
-// src/layouts/DashboardLayout.astro
 
 import "../styles/global.css";
 import BaseLayout from './BaseLayout.astro';
@@ -14,10 +13,10 @@ const { title, userType = 'admin' } = Astro.props;
 ---
 
 <BaseLayout title={title}>
-  <div class="flex h-screen">
-    <Sidebar client:load userType={userType} />
-    <main class="flex-1 overflow-y-auto p-8">
-      <slot />
-    </main>
-  </div>
+    <div class="flex h-screen">
+      <Sidebar client:load userType={userType} />
+      <main class="flex-1 overflow-y-auto p-8">
+        <slot />
+      </main>
+    </div>
 </BaseLayout>

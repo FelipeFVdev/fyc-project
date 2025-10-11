@@ -1,9 +1,12 @@
-import React, { useState } from "react"; // Explicitamente React
+// src/components/fornecedores/VisualizarFornecedor.tsx
+"use client";
+
+import React, { useState } from "react";
 import type { Fornecedor, Venda, ItemConsignacao } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { format } from "date-fns";
+import { addDays, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
   Table,
@@ -15,128 +18,95 @@ import {
 } from "@/components/ui/table";
 import { ExternalLink } from "lucide-react";
 
-import DialogEditarFornecedor from "./DialogEditarFornecedor";
+// --- IMPORTAR FUNÇÕES DE FETCH E HOOKS DO TANSTACK QUERY ---
+import {
+  getFornecedorById, // Para buscar o fornecedor específico
+  getItensConsignados, // Para buscar todos os itens consignados
+  getVendas, // Para buscar todas as vendas
+} from "@/lib/db";
+import { useQuery } from "@tanstack/react-query"; // Hook principal
+import { queryClient } from "@/store";
 
 interface VisualizarFornecedorProps {
   fornecedorId: string;
 }
 
-const initialMockFornecedor: Fornecedor = {
-  id: "f1",
-  nome: "Maria da Silva",
-  cpf: "11122233344",
-  telefone: "11987654321",
-  email: "maria@example.com",
-  endereco: {
-    rua: "Rua Principal",
-    numero: "100",
-    complemento: "Apto 10",
-    bairro: "Centro",
-    cidade: "São Paulo",
-    cep: "01000000",
-  },
-  tamanhoPreferencia: ["M", "G", "40"],
-  numeroVendas: 15,
-  status: "ativo",
-  dataCadastro: new Date("2024-01-15"),
-  senha: "hashed_password_example",
-};
-
-const mockItensConsignados: ItemConsignacao[] = [
-  {
-    id: "ic1",
-    fornecedorId: "f1",
-    codigoFornecedor: "MDS001",
-    dataInicioConsignacao: new Date("2024-05-01"),
-    dataExpiracao: new Date("2024-08-01"),
-    status: "vendido",
-    precoVenda: 80.0,
-    marca: "Farm",
-    tamanho: "M",
-    categoria: "Vestido",
-    descricao: "Vestido floral longo",
-  },
-  {
-    id: "ic2",
-    fornecedorId: "f1",
-    codigoFornecedor: "MDS002",
-    dataInicioConsignacao: new Date("2024-06-10"),
-    dataExpiracao: new Date("2024-09-10"),
-    status: "disponivel",
-    precoVenda: 50.0,
-    marca: "Levi's",
-    tamanho: "40",
-    categoria: "Calça Jeans",
-    descricao: "Calça jeans reta",
-  },
-  {
-    id: "ic3",
-    fornecedorId: "f1",
-    codigoFornecedor: "MDS003",
-    dataInicioConsignacao: new Date("2024-04-01"),
-    dataExpiracao: new Date("2024-07-01"),
-    status: "expirado",
-    precoVenda: 30.0,
-    marca: "C&A",
-    tamanho: "G",
-    categoria: "Blusa",
-    descricao: "Blusa de seda preta",
-  },
-];
-
-const mockHistoricoVendas: Venda[] = [
-  {
-    id: "v1",
-    dataVenda: new Date("2024-06-05"),
-    clienteNome: "Cliente Teste 1",
-    itens: [
-      { itemId: "ic1", tipo: "consignacao", precoVenda: 80.0, custoBase: 40.0 },
-    ],
-    valorTotal: 80.0,
-    custoTotal: 40.0,
-    margemLucro: 40.0,
-    formaPagamento: "pix",
-  },
-  {
-    id: "v2",
-    dataVenda: new Date("2024-06-20"),
-    clienteNome: "Cliente Teste 2",
-    itens: [
-      {
-        itemId: "garimpo-1",
-        tipo: "garimpo",
-        precoVenda: 30.0,
-        custoBase: 15.0,
-      },
-      {
-        itemId: "consignado-x",
-        tipo: "consignacao",
-        precoVenda: 100.0,
-        custoBase: 50.0,
-      },
-    ],
-    valorTotal: 130.0,
-    custoTotal: 65.0,
-    margemLucro: 65.0,
-    formaPagamento: "cartao",
-  },
-];
-
 export default function VisualizarFornecedor({
   fornecedorId,
 }: VisualizarFornecedorProps) {
-  const [fornecedor, setFornecedor] = useState<Fornecedor | null>(
-    fornecedorId === "f1" ? initialMockFornecedor : null
+  // --- BUSCAR O FORNECEDOR ESPECÍFICO ---
+  const {
+    data: fornecedor,
+    isLoading: isLoadingFornecedor,
+    isError: isErrorFornecedor,
+    // refetch: refetchFornecedor // Poderíamos usar para re-buscar manualmente
+  } = useQuery<Fornecedor | undefined, Error>(
+    {
+      queryKey: ["fornecedor", fornecedorId], // Key única para este fornecedor
+      queryFn: () => getFornecedorById(fornecedorId), // Função de fetch que retorna a Promise
+      enabled: !!fornecedorId, // Só busca se fornecedorId for válido
+    },
+    queryClient
   );
-  const [itensConsignados] = useState<ItemConsignacao[]>(mockItensConsignados);
-  const [historicoVendas] = useState<Venda[]>(mockHistoricoVendas);
 
-  if (!fornecedor) {
+  // --- BUSCAR TODOS OS ITENS CONSIGNADOS ---
+  const {
+    data: todosItensConsignados,
+    isLoading: isLoadingItensConsignados,
+    isError: isErrorItensConsignados,
+  } = useQuery<ItemConsignacao[], Error>(
+    {
+      queryKey: ["itensConsignados"],
+      queryFn: getItensConsignados,
+    },
+    queryClient
+  );
+
+  // --- BUSCAR TODAS AS VENDAS ---
+  const {
+    data: todasVendas,
+    isLoading: isLoadingVendas,
+    isError: isErrorVendas,
+  } = useQuery<Venda[], Error>(
+    {
+      queryKey: ["vendas"],
+      queryFn: getVendas,
+    },
+    queryClient
+  );
+
+  // --- LÓGICA DE CARREGAMENTO GLOBAL ---
+  if (isLoadingFornecedor || isLoadingItensConsignados || isLoadingVendas) {
+    return (
+      <div className="flex justify-center items-center h-48">
+        <p className="text-xl text-gray-700">
+          Carregando perfil do fornecedor...
+        </p>
+      </div>
+    );
+  }
+
+  // --- LÓGICA DE ERRO OU FORNECEDOR NÃO ENCONTRADO ---
+  if (
+    isErrorFornecedor ||
+    isErrorItensConsignados ||
+    isErrorVendas ||
+    !fornecedor
+  ) {
+    console.error("Erro na busca de dados para VisualizarFornecedor:", {
+      isErrorFornecedor,
+      isErrorItensConsignados,
+      isErrorVendas,
+      fornecedorExists: !!fornecedor,
+    });
     return (
       <div className="text-center py-10">
-        <h1 className="text-3xl font-bold mb-4">Fornecedor não encontrado.</h1>
+        <h1 className="text-3xl font-bold mb-4">
+          Fornecedor não encontrado ou erro.
+        </h1>
         <p className="text-lg text-gray-600">
-          Verifique o ID ou tente novamente.
+          Não foi possível carregar o perfil do fornecedor. Verifique o ID ou
+          tente novamente.
         </p>
         <Button
           onClick={() => (window.location.href = "/fornecedores")}
@@ -148,20 +118,74 @@ export default function VisualizarFornecedor({
     );
   }
 
+  // --- Processar dados (agora que sabemos que tudo está carregado e definido) ---
+  const itensConsignadosDoFornecedor = (todosItensConsignados || []).filter(
+    (item) => item.fornecedorId === fornecedorId
+  );
+
+  const historicoVendasDoFornecedor = (todasVendas || []).filter((venda) =>
+    venda.itens.some((vendaItem) =>
+      itensConsignadosDoFornecedor.some(
+        (consignadoItem) => consignadoItem.id === vendaItem.itemId
+      )
+    )
+  );
+
+  // A função handleFornecedorUpdate não é mais usada diretamente aqui,
+  // mas o DialogEditarFornecedor ainda a passará para a mutação,
+  // que então invalidará a query 'fornecedor', fazendo com que ele seja re-buscado.
   const handleFornecedorUpdate = (updatedFornecedor: Fornecedor) => {
-    setFornecedor(updatedFornecedor);
+    // A mutação no DialogEditarFornecedor já cuidará de invalidar a query 'fornecedor',
+    // o que fará com que este componente seja re-renderizado com os dados atualizados.
+    // console.log("Fornecedor atualizado via callback, TanStack Query vai re-buscar.");
+  };
+
+  const getStatusBadgeVariant = (item: ItemConsignacao) => {
+    const today = new Date();
+    const isPastDate =
+      format(item.dataExpiracao, "yyyy-MM-dd") < format(today, "yyyy-MM-dd"); // Comparação de datas como string para evitar problemas de hora
+    const isSoon =
+      format(item.dataExpiracao, "yyyy-MM-dd") <
+        format(addDays(today, 30), "yyyy-MM-dd") && !isPastDate;
+
+    if (item.status === "vendido") return "success";
+    if (item.status === "devolvido") return "info";
+    if (isPastDate) return "destructive";
+    if (isSoon) return "yellow";
+    return "default";
+  };
+
+  const getStatusText = (item: ItemConsignacao) => {
+    const today = new Date();
+    const isPastDate =
+      format(item.dataExpiracao, "yyyy-MM-dd") < format(today, "yyyy-MM-dd");
+    const isSoon =
+      format(item.dataExpiracao, "yyyy-MM-dd") <
+        format(addDays(today, 30), "yyyy-MM-dd") && !isPastDate;
+
+    if (item.status === "vendido") return "Vendido";
+    if (item.status === "devolvido") return "Devolvido";
+    if (isPastDate) return "Expirado";
+    if (isSoon) return "Próximo a Expirar";
+    return "Disponível";
   };
 
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-extrabold text-gray-900">
-          Informações do Fornecedor
-        </h1>
+        <div className="space-y-4">
+          <h1 className="text-4xl font-extrabold text-gray-900">
+            Informações do Fornecedor:
+          </h1>
+          <p className="text-2xl font-extrabold text-gray-900">
+            {fornecedor.nome}
+          </p>
+        </div>
         <div className="flex gap-4">
-          <a href={`/consignacao/extrato/${fornecedor.id}`}>
-            <Button variant="default">Ver Extrato</Button>
+          <a href={`/fornecedores/extrato/${fornecedor.id}`}>
+            <Button variant="secondary">Ver Extrato</Button>
           </a>
+          <Button variant="destructive">Excluir Fornecedor</Button>
         </div>
       </div>
 
@@ -183,7 +207,7 @@ export default function VisualizarFornecedor({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {itensConsignados.length === 0 ? (
+              {itensConsignadosDoFornecedor.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={7}
@@ -193,7 +217,7 @@ export default function VisualizarFornecedor({
                   </TableCell>
                 </TableRow>
               ) : (
-                itensConsignados.map((item) => (
+                itensConsignadosDoFornecedor.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell>{item.codigoFornecedor}</TableCell>
                     <TableCell>
@@ -206,20 +230,8 @@ export default function VisualizarFornecedor({
                       R$ {item.precoVenda.toFixed(2)}
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        variant={
-                          item.status === "disponivel"
-                            ? "default"
-                            : item.status === "vendido"
-                            ? "secondary"
-                            : "destructive"
-                        }
-                      >
-                        {item.status === "disponivel"
-                          ? "Disponível"
-                          : item.status === "vendido"
-                          ? "Vendido"
-                          : "Expirado"}
+                      <Badge variant={getStatusBadgeVariant(item)}>
+                        {getStatusText(item)}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -256,7 +268,7 @@ export default function VisualizarFornecedor({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {historicoVendas.length === 0 ? (
+              {historicoVendasDoFornecedor.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={5}
@@ -266,7 +278,7 @@ export default function VisualizarFornecedor({
                   </TableCell>
                 </TableRow>
               ) : (
-                historicoVendas.map((venda) => (
+                historicoVendasDoFornecedor.map((venda) => (
                   <TableRow key={venda.id}>
                     <TableCell>
                       {format(venda.dataVenda, "dd/MM/yyyy", { locale: ptBR })}

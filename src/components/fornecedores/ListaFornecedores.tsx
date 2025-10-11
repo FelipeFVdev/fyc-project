@@ -29,71 +29,44 @@ import { formatCpf, formatTelefone } from "@/lib/utils"; // Funções utilitári
 // --- NOVO COMPONENTE DE AÇÕES ---
 import FornecedorAcoes from "./AcoesFornecedor";
 
-const mockFornecedoresData: Fornecedor[] = [
-  /* ... seu mock ... */
-  {
-    id: "f1",
-    nome: "Maria da Silva",
-    cpf: "11122233344",
-    telefone: "11987654321",
-    email: "maria@example.com",
-    endereco: {
-      rua: "Rua Principal",
-      numero: "100",
-      bairro: "Centro",
-      cidade: "São Paulo",
-      cep: "01000000",
-    },
-    tamanhoPreferencia: ["M", "G", "40"],
-    numeroVendas: 15,
-    status: "ativo",
-    dataCadastro: new Date("2024-01-15"),
-  },
-  {
-    id: "f2",
-    nome: "João Oliveira",
-    cpf: "55566677788",
-    telefone: "21998765432",
-    email: "joao@example.com",
-    endereco: {
-      rua: "Avenida Brasil",
-      numero: "200",
-      bairro: "Jardins",
-      cidade: "Rio de Janeiro",
-      cep: "20000000",
-    },
-    tamanhoPreferencia: ["P", "36"],
-    numeroVendas: 5,
-    status: "ativo",
-    dataCadastro: new Date("2024-03-20"),
-  },
-  {
-    id: "f3",
-    nome: "Ana Souza",
-    cpf: "99988877766",
-    telefone: "31912345678",
-    email: "ana@example.com",
-    endereco: {
-      rua: "Rua das Flores",
-      numero: "50",
-      bairro: "Floresta",
-      cidade: "Belo Horizonte",
-      cep: "30000000",
-    },
-    tamanhoPreferencia: ["GG", "44"],
-    numeroVendas: 0,
-    status: "inativo",
-    dataCadastro: new Date("2024-02-10"),
-  },
-];
+// --- IMPORTAR FUNÇÃO DE FETCH E HOOKS DO TANSTACK QUERY ---
+import { getFornecedores } from "@/lib/db";
+import { useQuery } from "@tanstack/react-query";
+import { queryClient } from "@/store";
 
 export default function ListaFornecedores() {
-  const [fornecedores, setFornecedores] =
-    useState<Fornecedor[]>(mockFornecedoresData);
   const [busca, setBusca] = useState("");
   const [filtroStatus, setFiltroStatus] = useState<
     "todos" | "ativo" | "inativo"
   >("todos");
+
+  // --- BUSCAR FORNECEDORES COM USEQUERY ---
+  const {
+    data: fornecedores,
+    isLoading,
+    isError,
+  } = useQuery(
+    {
+      queryKey: ["fornecedores"],
+      queryFn: getFornecedores,
+    },
+    queryClient
+  );
+
+  // --- LÓGICA DE CARREGAMENTO E ERRO ---
+  if (isLoading)
+    return <div className="text-center py-8">Carregando fornecedores...</div>;
+  if (isError)
+    return (
+      <div className="text-center py-8 text-red-600">
+        Erro ao carregar fornecedores.
+      </div>
+    );
+  if (!fornecedores)
+    return (
+      <div className="text-center py-8">Nenhum fornecedor encontrado.</div>
+    );
+  // --- FIM LÓGICA DE CARREGAMENTO ---
 
   const fornecedoresFiltrados = fornecedores.filter((fornecedor) => {
     const matchBusca =
@@ -107,16 +80,6 @@ export default function ListaFornecedores() {
 
     return matchBusca && matchStatus;
   });
-
-  const handleFornecedorUpdated = (updatedFornecedor: Fornecedor) => {
-    setFornecedores((prev) =>
-      prev.map((f) => (f.id === updatedFornecedor.id ? updatedFornecedor : f))
-    );
-  };
-
-  const handleFornecedorDeleted = (fornecedorId: string) => {
-    setFornecedores((prev) => prev.filter((f) => f.id !== fornecedorId));
-  };
 
   return (
     <div className="space-y-4">
@@ -214,11 +177,7 @@ export default function ListaFornecedores() {
                   </TableCell>
                   <TableCell>
                     {/* Usando o novo componente de ações */}
-                    <FornecedorAcoes
-                      fornecedor={fornecedor}
-                      onFornecedorUpdated={handleFornecedorUpdated}
-                      onFornecedorDeleted={handleFornecedorDeleted}
-                    />
+                    <FornecedorAcoes fornecedor={fornecedor} />
                   </TableCell>
                 </TableRow>
               ))

@@ -1,12 +1,18 @@
 ---
-// src/pages/consignacao/extrato/[id].astro
 import DashboardLayout from '../../../layouts/DashboardLayout.astro';
 import ExtratoFornecedor from '../../../components/fornecedores/ExtratoFornecedor';
-import { mockFornecedores } from '../../../lib/db';
 
-// getStaticPaths para gerar páginas de extrato para cada fornecedor mockado
+// --- IMPORTAR A FUNÇÃO DE FETCH, NÃO O MOCK DIRETO ---
+import { getFornecedores } from '../../../lib/db'; // <-- Importe a função getFornecedores()
+// --- FIM DA IMPORTAÇÃO ---
+
+// getStaticPaths para gerar páginas de extrato para cada fornecedor
 export async function getStaticPaths() {
-  return mockFornecedores.map(fornecedor => ({
+  // --- CHAME A FUNÇÃO ASSÍNCRONA DE FETCH AQUI ---
+  const fornecedores = await getFornecedores(); // <--- CHAME A FUNÇÃO!
+  // --- FIM DA CHAMADA ---
+
+  return fornecedores.map(fornecedor => ({
     params: { id: fornecedor.id },
   }));
 }

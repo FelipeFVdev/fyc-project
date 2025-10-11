@@ -2,27 +2,12 @@
 // src/pages/consignacao/novo.astro
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
 import FormItemConsignacao from '../../components/consignacao/FormItemConsignacao';
-import type { Fornecedor } from '../../types'; // Importe Fornecedor para o mock
-
-// Mock de fornecedores para passar para o formulário (em um app real, viria de uma API/DB)
-const mockFornecedores: Fornecedor[] = [
-    {
-      id: 'f1', nome: 'Maria da Silva', cpf: '11122233344', telefone: '11987654321', email: 'maria@example.com',
-      endereco: { rua: 'Rua Principal', numero: '100', bairro: 'Centro', cidade: 'São Paulo', cep: '01000000', },
-      tamanhoPreferencia: ['M', 'G', '40'], numeroVendas: 15, status: 'ativo', dataCadastro: new Date('2024-01-15'),
-    },
-    {
-      id: 'f2', nome: 'João Oliveira', cpf: '55566677788', telefone: '21998765432', email: 'joao@example.com',
-      endereco: { rua: 'Avenida Brasil', numero: '200', bairro: 'Jardins', cidade: 'Rio de Janeiro', cep: '20000000', },
-      tamanhoPreferencia: ['P', '36'], numeroVendas: 5, status: 'ativo', dataCadastro: new Date('2024-03-20'),
-    },
-];
 
 ---
 
 <DashboardLayout title="Novo Item Consignado">
   <div class="max-w-xl mx-auto py-8">
     <h1 class="text-3xl font-bold mb-8 text-center">Cadastrar Item Consignado</h1>
-    <FormItemConsignacao client:load fornecedores={mockFornecedores} />
+    <FormItemConsignacao client:load />
   </div>
 </DashboardLayout>

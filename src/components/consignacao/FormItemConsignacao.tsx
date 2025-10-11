@@ -1,4 +1,5 @@
-"use client"; // Necessário por usar hooks (useState, useForm) e componentes interativos
+// src/components/consignacao/FormItemConsignacao.tsx
+"use client"; // Necessário por usar hooks (useState, useForm, useQuery) e componentes interativos
 
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -23,25 +24,39 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import type { ItemConsignacao, Fornecedor } from "@/types"; // Importação type-only
+import type { ItemConsignacao, Fornecedor } from "@/types";
 import { z } from "zod";
 import { addMonths, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+// --- IMPORTAR FUNÇÕES DE FETCH E HOOKS DO TANSTACK QUERY ---
+import { getFornecedores, addItemConsignado } from "@/lib/db"; // Função para adicionar item
+import { useQuery, useMutation } from "@tanstack/react-query"; // Adicionado useQueryClient para invalidar queries
+import { queryClient } from "@/store";
+
 type ItemConsignacaoFormData = z.infer<typeof itemConsignacaoSchema>;
 
 interface FormItemConsignacaoProps {
-  fornecedores: Fornecedor[]; // Lista de fornecedores para vincular
   fornecedorIdInicial?: string; // Para pré-selecionar um fornecedor
   onSubmitSuccess?: (newItem: ItemConsignacao) => void; // Callback opcional
 }
 
 export default function FormItemConsignacao({
-  fornecedores,
   fornecedorIdInicial,
   onSubmitSuccess,
 }: FormItemConsignacaoProps) {
-  const [isLoading, setIsLoading] = useState(false);
+  // --- BUSCAR FORNECEDORES COM USEQUERY ---
+  const {
+    data: fornecedores,
+    isLoading: isLoadingFornecedores,
+    isError: isErrorFornecedores,
+  } = useQuery<Fornecedor[], Error>(
+    {
+      queryKey: ["fornecedores"],
+      queryFn: getFornecedores,
+    },
+    queryClient
+  );
 
   const form = useForm<ItemConsignacaoFormData>({
     resolver: zodResolver(itemConsignacaoSchema),
@@ -55,15 +70,48 @@ export default function FormItemConsignacao({
     },
   });
 
-  // Atualiza o campo fornecedorId se fornecedorIdInicial mudar
   useEffect(() => {
     if (fornecedorIdInicial) {
       form.setValue("fornecedorId", fornecedorIdInicial);
     }
   }, [fornecedorIdInicial, form]);
 
+  // --- MUTATION PARA ADICIONAR ITEM CONSIGNADO ---
+  const addItemConsignadoMutation = useMutation(
+    {
+      mutationFn: addItemConsignado,
+      onSuccess: (newItem) => {
+        queryClient.invalidateQueries({ queryKey: ["itensConsignados"] }); // Invalida a lista de itens consignados
+        queryClient.invalidateQueries({
+          queryKey: ["fornecedor", newItem.fornecedorId],
+        }); // Opcional: Invalida o perfil do fornecedor se for relevante
+
+        toast.success("Item Consignado Cadastrado!", {
+          description: `O item '${newItem.categoria}' foi adicionado para ${
+            fornecedores?.find((f) => f.id === newItem.fornecedorId)?.nome ||
+            "um fornecedor desconhecido"
+          }.`,
+        });
+        form.reset({ fornecedorId: newItem.fornecedorId });
+        onSubmitSuccess?.(newItem);
+      },
+      onError: (error) => {
+        console.error("Erro ao cadastrar item consignado:", error);
+        toast.error("Erro no Cadastro", {
+          description:
+            error.message ||
+            "Não foi possível registrar o item. Tente novamente.",
+        });
+      },
+    },
+    queryClient
+  );
+
+  const isLoadingForm =
+    addItemConsignadoMutation.isPending || isLoadingFornecedores;
+
   async function onSubmit(data: ItemConsignacaoFormData) {
-    setIsLoading(true);
+    // setIsLoading(true); // useMutation já gerencia isso
     try {
       const dataInicioConsignacao = new Date();
       const dataExpiracao = addMonths(dataInicioConsignacao, 3); // 3 meses de expiração
@@ -79,29 +127,34 @@ export default function FormItemConsignacao({
         status: "disponivel",
       };
 
-      // Simulação de chamada de API/banco de dados
-      console.log("Item consignado a ser cadastrado:", newItemConsignacao);
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      toast.success("Item Consignado Cadastrado!", {
-        description: `O item '${
-          newItemConsignacao.categoria
-        }' foi adicionado para ${
-          fornecedores.find((f) => f.id === newItemConsignacao.fornecedorId)
-            ?.nome || "um fornecedor desconhecido"
-        }.`,
+      // Chama a mutação para adicionar o item
+      addItemConsignadoMutation.mutate(newItemConsignacao);
+    } catch (error: any) {
+      console.error("Erro na preparação do item consignado:", error);
+      toast.error("Erro na Preparação", {
+        description:
+          error.message || "Ocorreu um erro ao preparar o item consignado.",
       });
-      form.reset({ fornecedorId: data.fornecedorId }); // Reseta, mantendo o fornecedor selecionado
-      onSubmitSuccess?.(newItemConsignacao); // Chama o callback se houver
-    } catch (error) {
-      console.error("Erro ao cadastrar item consignado:", error);
-      toast.error("Erro no Cadastro", {
-        description: "Não foi possível registrar o item. Tente novamente.",
-      });
-    } finally {
-      setIsLoading(false);
     }
+    // finally { setIsLoading(false); } // useMutation já gerencia isso
   }
+
+  // --- LÓGICA DE CARREGAMENTO E ERRO ---
+  if (isLoadingFornecedores) {
+    return (
+      <div className="flex justify-center items-center h-48">
+        <p className="text-xl text-gray-700">Carregando fornecedores...</p>
+      </div>
+    );
+  }
+  if (isErrorFornecedores || !fornecedores) {
+    return (
+      <div className="text-center py-8 text-red-600">
+        Erro ao carregar fornecedores.
+      </div>
+    );
+  }
+  // --- FIM LÓGICA DE CARREGAMENTO E ERRO ---
 
   return (
     <Form {...form}>
@@ -125,12 +178,16 @@ export default function FormItemConsignacao({
                       Nenhum fornecedor disponível
                     </SelectItem>
                   ) : (
-                    fornecedores.map((fornecedor) => (
-                      <SelectItem key={fornecedor.id} value={fornecedor.id}>
-                        {fornecedor.nome} (CPF: {fornecedor.cpf.substring(0, 3)}
-                        ...)
-                      </SelectItem>
-                    ))
+                    fornecedores.map(
+                      (
+                        fornecedor // Usar 'fornecedores' do useQuery
+                      ) => (
+                        <SelectItem key={fornecedor.id} value={fornecedor.id}>
+                          {fornecedor.nome} (CPF:{" "}
+                          {fornecedor.cpf.substring(0, 3)}...)
+                        </SelectItem>
+                      )
+                    )
                   )}
                 </SelectContent>
               </Select>
@@ -227,8 +284,8 @@ export default function FormItemConsignacao({
         />
 
         <div className="flex gap-4 pt-6">
-          <Button type="submit" className="flex-1" disabled={isLoading}>
-            {isLoading ? "Cadastrando..." : "Cadastrar Item Consignado"}
+          <Button type="submit" className="flex-1" disabled={isLoadingForm}>
+            {isLoadingForm ? "Cadastrando..." : "Cadastrar Item Consignado"}
           </Button>
           <Button
             type="button"
@@ -236,7 +293,7 @@ export default function FormItemConsignacao({
             onClick={() =>
               form.reset({ fornecedorId: form.watch("fornecedorId") })
             }
-            disabled={isLoading}
+            disabled={isLoadingForm}
           >
             Limpar
           </Button>

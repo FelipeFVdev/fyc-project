@@ -1,0 +1,9 @@
+---
+// src/pages/vendas/index.astro
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import ListaVendas from '../../components/vendas/ListaVendas';
+---
+
+<DashboardLayout title="Gestão de Vendas">
+  <ListaVendas client:load />
+</DashboardLayout>

@@ -1,18 +1,23 @@
 ---
 // src/pages/fornecedores/[id].astro
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
-import VisualizarFornecedor from '../../components/fornecedores/VisualizarFornecedor'; // Importação atualizada
+import VisualizarFornecedor from '../../components/fornecedores/VisualizarFornecedor';
 
-// --- Bloco getStaticPaths (permanece o mesmo) ---
+// --- IMPORTAR A FUNÇÃO DE FETCH, NÃO O MOCK DIRETO ---
+import { getFornecedores } from '../../lib/db'; // <-- Importe a função getFornecedores()
+// --- FIM DA IMPORTAÇÃO ---
+
+
+// getStaticPaths para gerar páginas para cada fornecedor
 export async function getStaticPaths() {
-  const fornecedorIds = ['f1', 'f2', 'f3'];
+  // --- CHAME A FUNÇÃO ASSÍNCRONA DE FETCH AQUI ---
+  const fornecedores = await getFornecedores(); // <--- CHAME A FUNÇÃO!
+  // --- FIM DA CHAMADA ---
 
-  return fornecedorIds.map(id => ({
-    params: { id: id },
+  return fornecedores.map(fornecedor => ({
+    params: { id: fornecedor.id },
   }));
 }
-// --- Fim do Bloco getStaticPaths ---
-
 
 const { id } = Astro.params;
 ---

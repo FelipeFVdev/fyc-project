@@ -1,35 +1,16 @@
-// src/lib/db.ts
-
 import { addMonths, addDays } from "date-fns";
 import type {
   Fornecedor,
   ItemConsignacao,
   Venda,
   Cliente,
+  ItemGarimpo,
   PagamentoFornecedor,
 } from "@/types";
 
-// --- MOCK DE FORNECEDORES ---
-export const mockFornecedorExtrato: Fornecedor = {
-  id: "f1",
-  nome: "Maria da Silva",
-  cpf: "11122233344",
-  telefone: "11987654321",
-  email: "maria@example.com",
-  endereco: {
-    rua: "Rua Principal",
-    numero: "100",
-    bairro: "Centro",
-    cidade: "São Paulo",
-    cep: "01000000",
-  },
-  tamanhoPreferencia: ["M", "G", "40"],
-  numeroVendas: 15,
-  status: "ativo",
-  dataCadastro: new Date("2024-01-15"),
-};
-
-export const mockFornecedores: Fornecedor[] = [
+// --- MOCK DE DADOS GLOBALAIS (ainda são arrays, mas agora acessados por funções) ---
+// Estes arrays serão mutados temporariamente para simular atualizações
+export const _mockFornecedores: Fornecedor[] = [
   {
     id: "f1",
     nome: "Maria da Silva",
@@ -88,8 +69,7 @@ export const mockFornecedores: Fornecedor[] = [
   },
 ];
 
-// --- MOCK DE ITENS CONSIGNADOS ---
-export const mockItensConsignados: ItemConsignacao[] = [
+export const _mockItensConsignados: ItemConsignacao[] = [
   {
     id: "ic1",
     fornecedorId: "f1",
@@ -170,8 +150,7 @@ export const mockItensConsignados: ItemConsignacao[] = [
   },
 ];
 
-// --- MOCK DE VENDAS ---
-export const mockHistoricoVendas: Venda[] = [
+export const _mockHistoricoVendas: Venda[] = [
   {
     id: "v-abc",
     dataVenda: new Date("2024-06-05"),
@@ -206,12 +185,7 @@ export const mockHistoricoVendas: Venda[] = [
     dataVenda: new Date("2024-07-01"),
     clienteNome: "Cliente Teste 3",
     itens: [
-      {
-        itemId: "garimpo-2",
-        tipo: "garimpo",
-        precoVenda: 50.0,
-        custoBase: 20.0,
-      },
+      { itemId: "g1", tipo: "garimpo", precoVenda: 50.0, custoBase: 20.0 },
     ],
     valorTotal: 50.0,
     custoTotal: 20.0,
@@ -220,8 +194,7 @@ export const mockHistoricoVendas: Venda[] = [
   },
 ];
 
-// --- MOCK DE CLIENTES ---
-export const mockClientes: Cliente[] = [
+export const _mockClientes: Cliente[] = [
   {
     id: "c1",
     nome: "Cliente Fidelidade 1",
@@ -247,9 +220,7 @@ export const mockClientes: Cliente[] = [
   },
 ];
 
-// --- MOCK DE ITENS GARIMPO (para referência) ---
-// Pode ser necessário para outras partes do sistema
-export const mockItensGarimpo = [
+export const _mockItensGarimpo: ItemGarimpo[] = [
   {
     id: "g1",
     localCompra: "Bazar da Esquina",
@@ -265,10 +236,24 @@ export const mockItensGarimpo = [
     categoria: "Saia",
     descricao: "Saia midi florida",
   },
-  // ... outros itens de garimpo
+  {
+    id: "g2",
+    localCompra: "Feira de Trocas",
+    dataCompra: new Date("2024-02-01"),
+    custoCompra: 10.0,
+    custosAdicionais: 2.0,
+    margemLucro: 80,
+    precoVenda: 21.6,
+    status: "disponivel",
+    dataEntradaEstoque: new Date("2024-02-05"),
+    marca: "Sem Marca",
+    tamanho: "P",
+    categoria: "Blusa",
+    descricao: "Blusa de verão",
+  },
 ];
 
-export const mockPagamentos: PagamentoFornecedor[] = [
+export const _mockPagamentos: PagamentoFornecedor[] = [
   {
     id: "p1",
     fornecedorId: "f1",
@@ -289,3 +274,184 @@ export const mockPagamentos: PagamentoFornecedor[] = [
     status: "pendente",
   },
 ];
+
+// --- FUNÇÕES DE FETCH QUE RETORNAM PROMISES ---
+const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+// Fornecedores
+export async function getFornecedores(): Promise<Fornecedor[]> {
+  await delay(500); // Simula delay de rede
+  return _mockFornecedores;
+}
+export async function getFornecedorById(
+  id: string
+): Promise<Fornecedor | undefined> {
+  await delay(300);
+  return _mockFornecedores.find((f) => f.id === id);
+}
+export async function updateFornecedor(
+  updatedFornecedor: Fornecedor
+): Promise<Fornecedor> {
+  await delay(700);
+  const index = _mockFornecedores.findIndex(
+    (f) => f.id === updatedFornecedor.id
+  );
+  if (index !== -1) {
+    _mockFornecedores[index] = updatedFornecedor;
+  }
+  return updatedFornecedor;
+}
+export async function addFornecedor(
+  newFornecedor: Fornecedor
+): Promise<Fornecedor> {
+  await delay(700);
+  _mockFornecedores.push(newFornecedor);
+  return newFornecedor;
+}
+export async function deleteFornecedor(id: string): Promise<void> {
+  await delay(500);
+  const index = _mockFornecedores.findIndex((f) => f.id === id);
+  if (index !== -1) {
+    _mockFornecedores.splice(index, 1);
+  }
+}
+export async function getFornecedorPagamentos(
+  id: string
+): Promise<PagamentoFornecedor[]> {
+  await delay(400);
+  return _mockPagamentos.filter((p) => p.fornecedorId === id);
+}
+
+// Itens de Garimpo
+export async function getItensGarimpo(): Promise<ItemGarimpo[]> {
+  await delay(400);
+  return _mockItensGarimpo;
+}
+export async function getItemGarimpoById(
+  id: string
+): Promise<ItemGarimpo | undefined> {
+  await delay(300);
+  return _mockItensGarimpo.find((i) => i.id === id);
+}
+export async function addItemGarimpo(
+  newItem: ItemGarimpo
+): Promise<ItemGarimpo> {
+  await delay(700);
+  _mockItensGarimpo.push(newItem);
+  return newItem;
+}
+export async function updateItemGarimpo(
+  updatedItem: ItemGarimpo
+): Promise<ItemGarimpo> {
+  await delay(700);
+  const index = _mockItensGarimpo.findIndex((i) => i.id === updatedItem.id);
+  if (index !== -1) {
+    _mockItensGarimpo[index] = updatedItem;
+  }
+  return updatedItem;
+}
+export async function deleteItemGarimpo(id: string): Promise<void> {
+  await delay(500);
+  const index = _mockItensGarimpo.findIndex((i) => i.id === id);
+  if (index !== -1) {
+    _mockItensGarimpo.splice(index, 1);
+  }
+}
+
+// Itens de Consignação
+export async function getItensConsignados(): Promise<ItemConsignacao[]> {
+  await delay(400);
+  return _mockItensConsignados;
+}
+export async function getItemConsignadoById(
+  id: string
+): Promise<ItemConsignacao | undefined> {
+  await delay(300);
+  return _mockItensConsignados.find((i) => i.id === id);
+}
+export async function addItemConsignado(
+  newItem: ItemConsignacao
+): Promise<ItemConsignacao> {
+  await delay(700);
+  _mockItensConsignados.push(newItem);
+  return newItem;
+}
+export async function updateItemConsignado(
+  updatedItem: ItemConsignacao
+): Promise<ItemConsignacao> {
+  await delay(700);
+  const index = _mockItensConsignados.findIndex((i) => i.id === updatedItem.id);
+  if (index !== -1) {
+    _mockItensConsignados[index] = updatedItem;
+  }
+  return updatedItem;
+}
+export async function deleteItemConsignado(id: string): Promise<void> {
+  await delay(500);
+  const index = _mockItensConsignados.findIndex((f) => f.id === id);
+  if (index !== -1) {
+    _mockItensConsignados.splice(index, 1);
+  }
+}
+
+// Vendas
+export async function getVendas(): Promise<Venda[]> {
+  await delay(600);
+  return _mockHistoricoVendas;
+}
+export async function getVendaById(id: string): Promise<Venda | undefined> {
+  await delay(300);
+  return _mockHistoricoVendas.find((v) => v.id === id);
+}
+export async function addVenda(newVenda: Venda): Promise<Venda> {
+  await delay(900);
+  _mockHistoricoVendas.push(newVenda);
+  // Simular atualização de status dos itens vendidos
+  newVenda.itens.forEach((vendaItem) => {
+    const garimpoIndex = _mockItensGarimpo.findIndex(
+      (i) => i.id === vendaItem.itemId
+    );
+    if (garimpoIndex !== -1) {
+      _mockItensGarimpo[garimpoIndex].status = "vendido";
+    }
+    const consignadoIndex = _mockItensConsignados.findIndex(
+      (i) => i.id === vendaItem.itemId
+    );
+    if (consignadoIndex !== -1) {
+      _mockItensConsignados[consignadoIndex].status = "vendido";
+    }
+  });
+  return newVenda;
+}
+export async function estornarVenda(id: string): Promise<void> {
+  await delay(700);
+  const index = _mockHistoricoVendas.findIndex((v) => v.id === id);
+  if (index !== -1) {
+    const estornada = _mockHistoricoVendas.splice(index, 1)[0]; // Remove e obtém a venda
+    // Lógica para reverter status dos itens... (mais complexo para mock simples)
+    console.log(`Venda ${id} estornada (removida do mock).`);
+  }
+}
+
+// Clientes
+export async function getClientes(): Promise<Cliente[]> {
+  await delay(400);
+  return _mockClientes;
+}
+export async function getClienteById(id: string): Promise<Cliente | undefined> {
+  await delay(300);
+  return _mockClientes.find((c) => c.id === id);
+}
+export async function addCliente(newCliente: Cliente): Promise<Cliente> {
+  await delay(700);
+  _mockClientes.push(newCliente);
+  return newCliente;
+}
+export async function updateCliente(updatedCliente: Cliente): Promise<Cliente> {
+  await delay(700);
+  const index = _mockClientes.findIndex((c) => c.id === updatedCliente.id);
+  if (index !== -1) {
+    _mockClientes[index] = updatedCliente;
+  }
+  return updatedCliente;
+}
