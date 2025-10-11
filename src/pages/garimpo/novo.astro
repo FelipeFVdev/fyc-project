@@ -1,0 +1,12 @@
+---
+// src/pages/garimpo/novo.astro
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import FormItemGarimpo from '../../components/garimpo/FormItemGarimpo';
+---
+
+<DashboardLayout title="Novo Item Garimpo">
+  <div class="max-w-4xl">
+    <h1 class="text-3xl font-bold mb-8">Cadastrar Item Garimpo</h1>
+    <FormItemGarimpo client:load />
+  </div>
+</DashboardLayout>
