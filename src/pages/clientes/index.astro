@@ -1,0 +1,9 @@
+---
+// src/pages/clientes/index.astro
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import ListaClientes from '../../components/clientes/ListaClientes';
+---
+
+<DashboardLayout title="Clientes">
+  <ListaClientes client:load />
+</DashboardLayout>

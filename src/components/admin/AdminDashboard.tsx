@@ -112,7 +112,7 @@ export default function AdminDashboard() {
             <a href="/consignacao/novo">
               <Button variant="outline">Cadastrar Consignação</Button>
             </a>
-            <a href="/vendas/nova">
+            <a href="/vendas/novo">
               <Button variant="outline">Registrar Venda</Button>
             </a>
             <a href="/fornecedores/novo">

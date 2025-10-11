@@ -1,0 +1,12 @@
+---
+// src/pages/clientes/novo.astro
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import FormCliente from '../../components/clientes/FormCliente';
+---
+
+<DashboardLayout title="Novo Cliente">
+  <div class="max-w-xl mx-auto py-8">
+    <h1 class="text-3xl font-bold mb-8 text-center">Cadastrar Novo Cliente</h1>
+    <FormCliente client:load />
+  </div>
+</DashboardLayout>
