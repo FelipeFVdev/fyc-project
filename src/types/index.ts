@@ -44,7 +44,7 @@ export interface ItemConsignacao {
   codigoFornecedor: string;
   dataInicioConsignacao: Date;
   dataExpiracao: Date;
-  status: "disponivel" | "vendido" | "expirado";
+  status: "disponivel" | "vendido" | "expirado" | "devolvido";
   precoVenda: number;
   marca?: string;
   tamanho?: string;

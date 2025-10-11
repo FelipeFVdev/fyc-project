@@ -1,0 +1,34 @@
+---
+// src/pages/consignacao/[id].astro
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import ItemConsignacaoDetalhes from '../../components/consignacao/ItemConsignacaoDetalhes';
+import type { ItemConsignacao, Fornecedor } from '../../types';
+
+// --- Importe os mocks do db.ts ---
+import { mockItensConsignados, mockFornecedores } from '../../lib/db';
+// --- Fim da importação dos mocks ---
+
+// getStaticPaths é necessário para rotas dinâmicas em Astro
+export async function getStaticPaths() {
+  return mockItensConsignados.map(item => ({
+    params: { id: item.id },
+    props: { item },
+  }));
+}
+
+const { id } = Astro.params;
+const { item } = Astro.props as { item: ItemConsignacao };
+
+const fornecedorDoItem = mockFornecedores.find(f => f.id === item.fornecedorId);
+const fornecedorNome = fornecedorDoItem?.nome || 'Fornecedor Desconhecido';
+
+---
+
+<DashboardLayout title={`Detalhes do Item ${item.codigoFornecedor}`}>
+  <h1 class="text-3xl font-bold mb-8">
+    Item Consignado: {item.marca || ''} {item.categoria || ''}
+  </h1>
+  <p class="text-lg text-gray-600 mb-6">Fornecido por: <a href={`/fornecedores/${item.fornecedorId}`} class="text-blue-600 hover:underline">{fornecedorNome}</a></p>
+  
+  <ItemConsignacaoDetalhes client:load item={item} fornecedorNome={fornecedorNome} />
+</DashboardLayout>

@@ -1,0 +1,9 @@
+---
+// src/pages/consignacao/index.astro
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import GestaoConsignacao from '../../components/consignacao/GestaoConsignacao';
+---
+
+<DashboardLayout title="Gestão de Consignação">
+  <GestaoConsignacao client:load />
+</DashboardLayout>

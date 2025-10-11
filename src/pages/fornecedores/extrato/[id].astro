@@ -1,0 +1,19 @@
+---
+// src/pages/consignacao/extrato/[id].astro
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import ExtratoFornecedor from '../../../components/fornecedores/ExtratoFornecedor';
+import { mockFornecedores } from '../../../lib/db';
+
+// getStaticPaths para gerar páginas de extrato para cada fornecedor mockado
+export async function getStaticPaths() {
+  return mockFornecedores.map(fornecedor => ({
+    params: { id: fornecedor.id },
+  }));
+}
+
+const { id } = Astro.params;
+---
+
+<DashboardLayout title={`Extrato: ${id}`}>
+  <ExtratoFornecedor client:load fornecedorId={id!} />
+</DashboardLayout>

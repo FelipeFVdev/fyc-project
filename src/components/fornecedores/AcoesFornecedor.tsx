@@ -65,7 +65,14 @@ export default function FornecedorAcoes({
               (window.location.href = `/fornecedores/${fornecedor.id}`)
             }
           >
-            Informações
+            Ver Informações
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() =>
+              (window.location.href = `/consignacao/extrato/${fornecedor.id}`)
+            }
+          >
+            Ver Extrato
           </DropdownMenuItem>
           {/* O botão "Editar" abre o Dialog */}
           <DropdownMenuItem

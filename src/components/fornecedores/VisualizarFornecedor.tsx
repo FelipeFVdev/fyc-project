@@ -158,6 +158,11 @@ export default function VisualizarFornecedor({
         <h1 className="text-4xl font-extrabold text-gray-900">
           Informações do Fornecedor
         </h1>
+        <div className="flex gap-4">
+          <a href={`/consignacao/extrato/${fornecedor.id}`}>
+            <Button variant="default">Ver Extrato</Button>
+          </a>
+        </div>
       </div>
 
       <Card>
