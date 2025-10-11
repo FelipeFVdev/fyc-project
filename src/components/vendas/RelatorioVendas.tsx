@@ -110,7 +110,7 @@ export default function RelatorioVendas() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-48">
-        <p className="text-xl text-gray-700">
+        <p className="text-xl text-neutral-700">
           Carregando relatório de vendas...
         </p>
       </div>
@@ -226,7 +226,7 @@ export default function RelatorioVendas() {
                 <TableRow>
                   <TableCell
                     colSpan={7}
-                    className="text-center py-8 text-gray-500"
+                    className="text-center py-8 text-neutral-500"
                   >
                     Nenhuma venda encontrada para o período selecionado.
                   </TableCell>

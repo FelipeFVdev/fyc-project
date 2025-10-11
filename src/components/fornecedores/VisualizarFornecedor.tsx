@@ -79,7 +79,7 @@ export default function VisualizarFornecedor({
   if (isLoadingFornecedor || isLoadingItensConsignados || isLoadingVendas) {
     return (
       <div className="flex justify-center items-center h-48">
-        <p className="text-xl text-gray-700">
+        <p className="text-xl text-neutral-700">
           Carregando perfil do fornecedor...
         </p>
       </div>
@@ -104,7 +104,7 @@ export default function VisualizarFornecedor({
         <h1 className="text-3xl font-bold mb-4">
           Fornecedor não encontrado ou erro.
         </h1>
-        <p className="text-lg text-gray-600">
+        <p className="text-lg text-neutral-600">
           Não foi possível carregar o perfil do fornecedor. Verifique o ID ou
           tente novamente.
         </p>
@@ -174,10 +174,10 @@ export default function VisualizarFornecedor({
     <div className="space-y-8">
       <div className="flex justify-between items-center mb-8">
         <div className="space-y-4">
-          <h1 className="text-4xl font-extrabold text-gray-900">
+          <h1 className="text-4xl font-extrabold text-neutral-900">
             Informações do Fornecedor:
           </h1>
-          <p className="text-2xl font-extrabold text-gray-900">
+          <p className="text-2xl font-extrabold text-neutral-900">
             {fornecedor.nome}
           </p>
         </div>
@@ -211,7 +211,7 @@ export default function VisualizarFornecedor({
                 <TableRow>
                   <TableCell
                     colSpan={7}
-                    className="text-center py-4 text-gray-500"
+                    className="text-center py-4 text-neutral-500"
                   >
                     Nenhum item consignado para este fornecedor.
                   </TableCell>
@@ -272,7 +272,7 @@ export default function VisualizarFornecedor({
                 <TableRow>
                   <TableCell
                     colSpan={5}
-                    className="text-center py-4 text-gray-500"
+                    className="text-center py-4 text-neutral-500"
                   >
                     Nenhuma venda registrada para este fornecedor.
                   </TableCell>

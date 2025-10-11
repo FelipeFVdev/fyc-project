@@ -482,14 +482,14 @@ export default function FormVenda() {
             </Button>
           </div>
 
-          <div className="bg-gray-50 p-6 rounded-lg space-y-2">
+          <div className="bg-neutral-50 p-6 rounded-lg space-y-2">
             <h3 className="font-semibold text-xl mb-4">Resumo Financeiro</h3>
             <div className="flex justify-between">
-              <span className="text-gray-600">Valor Total dos Itens:</span>
+              <span className="text-neutral-600">Valor Total dos Itens:</span>
               <span className="font-bold">R$ {valorTotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Custo Total (para loja):</span>
+              <span className="text-neutral-600">Custo Total (para loja):</span>
               <span className="font-bold">R$ {custoTotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-lg font-bold border-t pt-2 mt-2">

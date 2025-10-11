@@ -111,7 +111,9 @@ export default function VisualizarCliente({
   if (isLoadingCliente || isLoadingVendas) {
     return (
       <div className="flex justify-center items-center h-48">
-        <p className="text-xl text-gray-700">Carregando perfil do cliente...</p>
+        <p className="text-xl text-neutral-700">
+          Carregando perfil do cliente...
+        </p>
       </div>
     );
   }
@@ -128,7 +130,7 @@ export default function VisualizarCliente({
         <h1 className="text-3xl font-bold mb-4">
           Cliente não encontrado ou erro.
         </h1>
-        <p className="text-lg text-gray-600">
+        <p className="text-lg text-neutral-600">
           Não foi possível carregar o perfil do cliente. Verifique o ID ou tente
           novamente.
         </p>
@@ -146,7 +148,7 @@ export default function VisualizarCliente({
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-extrabold text-gray-900">
+        <h1 className="text-4xl font-extrabold text-neutral-900">
           Perfil do Cliente: {cliente.nome}
         </h1>
         <div className="flex gap-4">
@@ -183,7 +185,7 @@ export default function VisualizarCliente({
                 <TableRow>
                   <TableCell
                     colSpan={5}
-                    className="text-center py-4 text-gray-500"
+                    className="text-center py-4 text-neutral-500"
                   >
                     Nenhuma compra registrada para este cliente.
                   </TableCell>

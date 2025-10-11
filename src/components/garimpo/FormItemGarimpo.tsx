@@ -320,14 +320,14 @@ export default function FormItemGarimpo() {
           )}
         />
 
-        <div className="bg-gray-50 p-6 rounded-lg space-y-2">
+        <div className="bg-neutral-50 p-6 rounded-lg space-y-2">
           <h3 className="font-semibold text-lg mb-4">Resumo de Preços</h3>
           <div className="flex justify-between">
-            <span className="text-gray-600">Custo Total:</span>
+            <span className="text-neutral-600">Custo Total:</span>
             <span className="font-medium">R$ {custoTotal.toFixed(2)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600">Margem de Lucro:</span>
+            <span className="text-neutral-600">Margem de Lucro:</span>
             <span className="font-medium">{margemLucro}%</span>
           </div>
           <div className="flex justify-between text-lg font-bold border-t pt-2 mt-2">

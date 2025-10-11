@@ -143,7 +143,7 @@ export default function FormItemConsignacao({
   if (isLoadingFornecedores) {
     return (
       <div className="flex justify-center items-center h-48">
-        <p className="text-xl text-gray-700">Carregando fornecedores...</p>
+        <p className="text-xl text-neutral-700">Carregando fornecedores...</p>
       </div>
     );
   }

@@ -262,7 +262,7 @@ export default function ExtratoFornecedor({
   ) {
     return (
       <div className="flex justify-center items-center h-48">
-        <p className="text-xl text-gray-700">
+        <p className="text-xl text-neutral-700">
           Carregando extrato do fornecedor...
         </p>
       </div>
@@ -289,7 +289,7 @@ export default function ExtratoFornecedor({
         <h1 className="text-3xl font-bold mb-4">
           Extrato não encontrado ou erro.
         </h1>
-        <p className="text-lg text-gray-600">
+        <p className="text-lg text-neutral-600">
           Não foi possível carregar o extrato do fornecedor. Verifique o ID ou
           tente novamente.
         </p>
@@ -305,7 +305,7 @@ export default function ExtratoFornecedor({
 
   return (
     <div className="space-y-8">
-      <h1 className="text-4xl font-extrabold text-gray-900 mb-8">
+      <h1 className="text-4xl font-extrabold text-neutral-900 mb-8">
         Extrato de {extrato.fornecedor.nome}
       </h1>
 
@@ -315,13 +315,13 @@ export default function ExtratoFornecedor({
             <CardTitle className="text-sm font-medium">
               Saldo em Crédito de Loja
             </CardTitle>
-            <Currency className="h-4 w-4 text-gray-500" />
+            <Currency className="h-4 w-4 text-neutral-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               R$ {extrato.saldoDisponivelCredito.toFixed(2)}
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-neutral-500">
               Valor disponível para compras na loja
             </p>
             {extrato.saldoDisponivelCredito > 0 && (
@@ -348,13 +348,13 @@ export default function ExtratoFornecedor({
             <CardTitle className="text-sm font-medium">
               Saldo em Dinheiro
             </CardTitle>
-            <Currency className="h-4 w-4 text-gray-500" />
+            <Currency className="h-4 w-4 text-neutral-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               R$ {extrato.saldoDisponivelDinheiro.toFixed(2)}
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-neutral-500">
               Valor disponível para retirada
             </p>
             {extrato.saldoDisponivelDinheiro > 0 && (
@@ -381,13 +381,13 @@ export default function ExtratoFornecedor({
             <CardTitle className="text-sm font-medium">
               Itens Vendidos (para este fornecedor)
             </CardTitle>
-            <Package className="h-4 w-4 text-gray-500" />
+            <Package className="h-4 w-4 text-neutral-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {extrato.itensVendidos.length}
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-neutral-500">
               {extrato.itensVendidos.length === 1
                 ? "item vendido"
                 : "itens vendidos"}
@@ -417,7 +417,7 @@ export default function ExtratoFornecedor({
                 <TableRow>
                   <TableCell
                     colSpan={6}
-                    className="text-center py-4 text-gray-500"
+                    className="text-center py-4 text-neutral-500"
                   >
                     Nenhum item consignado deste fornecedor foi vendido ainda.
                   </TableCell>
@@ -478,7 +478,7 @@ export default function ExtratoFornecedor({
                 <TableRow>
                   <TableCell
                     colSpan={5}
-                    className="text-center py-4 text-gray-500"
+                    className="text-center py-4 text-neutral-500"
                   >
                     Nenhum pagamento ou saque registrado.
                   </TableCell>

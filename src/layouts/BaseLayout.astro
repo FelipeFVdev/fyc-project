@@ -3,6 +3,7 @@
 import "../styles/global.css";
 
 import { Toaster } from "@/components/ui/sonner";
+import ThemeProvider from '@/components/ThemeProvider';
 
 interface Props {
   title: string;
@@ -20,8 +21,10 @@ const { title = 'FYC', description = 'Sistema de Gestão de Brechó' } = Astro.p
     <title>{title} | Brechó System</title>
     <meta name="description" content={description} />
   </head>
-  <body class="min-h-screen bg-gray-50">
-    <slot />
-    <Toaster richColors  client:load/>
+  <body class="min-h-screen bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">
+    <ThemeProvider client:load> {/* client:load é CRUCIAL para este componente React */}
+      <slot />
+      <Toaster client:load /> {/* Toaster também é React e precisa de client:load */}
+    </ThemeProvider>
   </body>
 </html>

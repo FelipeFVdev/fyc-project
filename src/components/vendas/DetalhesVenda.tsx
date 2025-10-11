@@ -99,7 +99,9 @@ export default function DetalhesVenda({ vendaId }: DetalhesVendaProps) {
   ) {
     return (
       <div className="flex justify-center items-center h-48">
-        <p className="text-xl text-gray-700">Carregando detalhes da venda...</p>
+        <p className="text-xl text-neutral-700">
+          Carregando detalhes da venda...
+        </p>
       </div>
     );
   }
@@ -125,9 +127,9 @@ export default function DetalhesVenda({ vendaId }: DetalhesVendaProps) {
     return (
       <div className="text-center py-10">
         <h1 className="text-3xl font-bold mb-4">
-          Venda não encontrada ou erro.
+          Venda não encontrada ou eneutral
         </h1>
-        <p className="text-lg text-gray-600">
+        <p className="text-lg text-neutral-600">
           Não foi possível carregar os detalhes da venda. Verifique o ID ou
           tente novamente.
         </p>
@@ -147,8 +149,9 @@ export default function DetalhesVenda({ vendaId }: DetalhesVendaProps) {
 
   return (
     <div className="space-y-8">
+      neutral
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-extrabold text-gray-900">
+        <h1 className="text-4xl font-extrabold text-neutral-900">
           Detalhes da Venda {venda.id.substring(0, 8)}
         </h1>
         <div className="flex gap-4">
@@ -156,13 +159,12 @@ export default function DetalhesVenda({ vendaId }: DetalhesVendaProps) {
           <Button variant="destructive">Estornar Venda</Button>
         </div>
       </div>
-
       <Card>
         <CardHeader>
           <CardTitle>Resumo da Venda</CardTitle>
-          <CardDescription>ID da Venda: {venda.id}</CardDescription>
+          <CardDescription>ID da Venda: {venda.id}</CardDescription>neutral
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 text-gray-700">
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 text-neutral-700">
           <div>
             <p className="font-semibold">Data da Venda:</p>
             <p>
@@ -198,7 +200,6 @@ export default function DetalhesVenda({ vendaId }: DetalhesVendaProps) {
           </div>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle>Itens Vendidos</CardTitle>
@@ -258,7 +259,6 @@ export default function DetalhesVenda({ vendaId }: DetalhesVendaProps) {
           </Table>
         </CardContent>
       </Card>
-
       <div className="flex justify-end mt-8">
         <Button
           onClick={() => (window.location.href = "/vendas")}

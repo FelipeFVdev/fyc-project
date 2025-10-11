@@ -220,7 +220,7 @@ export default function GestaoConsignacao() {
   if (isLoadingItens || isLoadingFornecedores) {
     return (
       <div className="flex justify-center items-center h-48">
-        <p className="text-xl text-gray-700">
+        <p className="text-xl text-neutral-700">
           Carregando itens e fornecedores...
         </p>
       </div>
@@ -251,7 +251,7 @@ export default function GestaoConsignacao() {
 
       <div className="flex gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
           <Input
             placeholder="Buscar por marca, categoria, código ou fornecedor..."
             value={busca}
@@ -329,7 +329,7 @@ export default function GestaoConsignacao() {
               <TableRow>
                 <TableCell
                   colSpan={10}
-                  className="text-center py-8 text-gray-500"
+                  className="text-center py-8 text-neutral-500"
                 >
                   Nenhum item consignado encontrado.
                 </TableCell>

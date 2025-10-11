@@ -8,6 +8,7 @@ import {
   Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import { useEffect, useState } from "react"; // Importar useEffect e useState
 
 interface SidebarProps {
@@ -50,10 +51,10 @@ export default function Sidebar({ userType }: SidebarProps) {
   }, []); // O array vazio garante que o efeito só rode uma vez, na montagem
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 p-4">
+    <aside className="w-64 bg-neutral-100 border-r border-neutral-200 dark:bg-neutral-800 dark:border-neutral-700 p-4">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">
-          {userType === "admin" ? "Brechó Admin" : "Minha Conta"}
+        <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">
+          {userType === "admin" ? "FYC Admin" : "Minha Conta"}
         </h1>
       </div>
 
@@ -70,8 +71,8 @@ export default function Sidebar({ userType }: SidebarProps) {
               className={cn(
                 "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
                 isActive
-                  ? "bg-gray-900 text-white"
-                  : "text-gray-700 hover:bg-gray-100"
+                  ? "bg-neutral-900 text-white"
+                  : "text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-700"
               )}
             >
               <Icon className="w-5 h-5" />
@@ -81,17 +82,23 @@ export default function Sidebar({ userType }: SidebarProps) {
         })}
       </nav>
 
-      {userType === "admin" && (
-        <div className="mt-auto pt-8">
+      <div className="mt-auto pt-8 border-t border-neutral-200 dark:border-neutral-700">
+        {" "}
+        {/* Linha divisória */}
+        {userType === "admin" && (
           <a
             href="/settings"
-            className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            className="flex items-center gap-3 px-4 py-3 text-neutral-700 hover:bg-neutral-100 rounded-lg transition-colors dark:text-neutral-200 dark:hover:bg-neutral-700"
           >
             <Settings className="w-5 h-5" />
             <span className="font-medium">Configurações</span>
           </a>
+        )}
+        <div className="flex items-center gap-3 px-4 py-3 text-neutral-700 hover:bg-neutral-100 rounded-lg transition-colors dark:text-neutral-200 dark:hover:bg-neutral-700">
+          <AnimatedThemeToggler />
+          <span className="font-medium">Tema</span>
         </div>
-      )}
+      </div>
     </aside>
   );
 }
