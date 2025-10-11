@@ -1,6 +1,8 @@
 ---
 // src/layouts/BaseLayout.astro
 import "../styles/global.css";
+
+import { Toaster } from "@/components/ui/sonner";
 interface Props {
   title: string;
   description?: string;
@@ -19,5 +21,6 @@ const { title = 'FYC', description = 'Sistema de Gestão de Brechó' } = Astro.p
   </head>
   <body class="min-h-screen bg-gray-50">
     <slot />
+    <Toaster/>
   </body>
 </html>

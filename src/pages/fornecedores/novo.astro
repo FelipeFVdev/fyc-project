@@ -1,0 +1,12 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import FormFornecedor from '../../components/fornecedores/FormFornecedor';
+import { toast } from 'sonner'; // Certifique-se de importar e usar o Toaster
+---
+
+<DashboardLayout title="Novo Fornecedor">
+  <div class="max-w-4xl mx-auto py-8">
+    <h1 class="text-3xl font-bold mb-8">Cadastrar Novo Fornecedor</h1>
+    <FormFornecedor client:load />
+  </div>
+</DashboardLayout>
