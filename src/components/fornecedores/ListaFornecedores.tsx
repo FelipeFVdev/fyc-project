@@ -1,6 +1,8 @@
 // src/components/fornecedores/ListaFornecedores.tsx
-import { useState } from "react";
-import { Fornecedor } from "@/types";
+"use client"; // Precisa de "use client" porque usa hooks de React
+
+import React, { useState } from "react"; // Explicitamente React
+import type { Fornecedor } from "@/types";
 import {
   Table,
   TableBody,
@@ -13,17 +15,22 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  DropdownMenu,
+  DropdownMenu, // Manter se precisar do DropdownMenu em outro lugar aqui
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Search, Filter } from "lucide-react";
+import { Search, Filter } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-// Mock data - substituir por dados reais
-const mockFornecedores: Fornecedor[] = [
+import { formatCpf, formatTelefone } from "@/lib/utils"; // Funções utilitárias
+
+// --- NOVO COMPONENTE DE AÇÕES ---
+import FornecedorAcoes from "./AcoesFornecedor";
+
+const mockFornecedoresData: Fornecedor[] = [
+  /* ... seu mock ... */
   {
     id: "f1",
     nome: "Maria da Silva",
@@ -35,7 +42,6 @@ const mockFornecedores: Fornecedor[] = [
       numero: "100",
       bairro: "Centro",
       cidade: "São Paulo",
-      estado: "SP",
       cep: "01000000",
     },
     tamanhoPreferencia: ["M", "G", "40"],
@@ -54,7 +60,6 @@ const mockFornecedores: Fornecedor[] = [
       numero: "200",
       bairro: "Jardins",
       cidade: "Rio de Janeiro",
-      estado: "RJ",
       cep: "20000000",
     },
     tamanhoPreferencia: ["P", "36"],
@@ -73,7 +78,6 @@ const mockFornecedores: Fornecedor[] = [
       numero: "50",
       bairro: "Floresta",
       cidade: "Belo Horizonte",
-      estado: "MG",
       cep: "30000000",
     },
     tamanhoPreferencia: ["GG", "44"],
@@ -84,7 +88,8 @@ const mockFornecedores: Fornecedor[] = [
 ];
 
 export default function ListaFornecedores() {
-  const [fornecedores] = useState<Fornecedor[]>(mockFornecedores); // Em um app real, viria de um hook/API
+  const [fornecedores, setFornecedores] =
+    useState<Fornecedor[]>(mockFornecedoresData);
   const [busca, setBusca] = useState("");
   const [filtroStatus, setFiltroStatus] = useState<
     "todos" | "ativo" | "inativo"
@@ -103,26 +108,14 @@ export default function ListaFornecedores() {
     return matchBusca && matchStatus;
   });
 
-  // Função para formatar CPF para exibição
-  const formatCpfDisplay = (cpf: string) => {
-    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+  const handleFornecedorUpdated = (updatedFornecedor: Fornecedor) => {
+    setFornecedores((prev) =>
+      prev.map((f) => (f.id === updatedFornecedor.id ? updatedFornecedor : f))
+    );
   };
 
-  // Função para formatar Telefone para exibição
-  const formatTelefoneDisplay = (telefone: string) => {
-    const cleaned = telefone.replace(/\D/g, "");
-    if (cleaned.length === 11) {
-      return `(${cleaned.substring(0, 2)}) ${cleaned.substring(
-        2,
-        7
-      )}-${cleaned.substring(7, 11)}`;
-    } else if (cleaned.length === 10) {
-      return `(${cleaned.substring(0, 2)}) ${cleaned.substring(
-        2,
-        6
-      )}-${cleaned.substring(6, 10)}`;
-    }
-    return telefone; // Retorna como está se não conseguir formatar
+  const handleFornecedorDeleted = (fornecedorId: string) => {
+    setFornecedores((prev) => prev.filter((f) => f.id !== fornecedorId));
   };
 
   return (
@@ -134,7 +127,6 @@ export default function ListaFornecedores() {
         </a>
       </div>
 
-      {/* Filtros */}
       <div className="flex gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -172,7 +164,6 @@ export default function ListaFornecedores() {
         </DropdownMenu>
       </div>
 
-      {/* Tabela */}
       <div className="border rounded-lg overflow-hidden">
         <Table>
           <TableHeader>
@@ -201,17 +192,10 @@ export default function ListaFornecedores() {
               fornecedoresFiltrados.map((fornecedor) => (
                 <TableRow key={fornecedor.id}>
                   <TableCell className="font-medium">
-                    <a
-                      href={`/fornecedores/${fornecedor.id}`}
-                      className="text-blue-600 hover:underline"
-                    >
-                      {fornecedor.nome}
-                    </a>
+                    {fornecedor.nome}
                   </TableCell>
-                  <TableCell>{formatCpfDisplay(fornecedor.cpf)}</TableCell>
-                  <TableCell>
-                    {formatTelefoneDisplay(fornecedor.telefone)}
-                  </TableCell>
+                  <TableCell>{formatCpf(fornecedor.cpf)}</TableCell>
+                  <TableCell>{formatTelefone(fornecedor.telefone)}</TableCell>
                   <TableCell>{fornecedor.email || "-"}</TableCell>
                   <TableCell>{fornecedor.numeroVendas}</TableCell>
                   <TableCell>
@@ -229,26 +213,12 @@ export default function ListaFornecedores() {
                     })}
                   </TableCell>
                   <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() =>
-                            (window.location.href = `/fornecedores/${fornecedor.id}`)
-                          }
-                        >
-                          Ver perfil
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>Editar</DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">
-                          Excluir
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    {/* Usando o novo componente de ações */}
+                    <FornecedorAcoes
+                      fornecedor={fornecedor}
+                      onFornecedorUpdated={handleFornecedorUpdated}
+                      onFornecedorDeleted={handleFornecedorDeleted}
+                    />
                   </TableCell>
                 </TableRow>
               ))

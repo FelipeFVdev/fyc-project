@@ -29,7 +29,6 @@ export interface Fornecedor {
     complemento?: string;
     bairro: string;
     cidade: string;
-    estado: string;
     cep: string;
   };
   tamanhoPreferencia?: string[];
@@ -83,7 +82,6 @@ export interface Cliente {
     complemento?: string;
     bairro: string;
     cidade: string;
-    estado: string;
     cep: string;
   };
   dataCadastro: Date;

@@ -27,7 +27,6 @@ export const fornecedorSchema = z.object({
     complemento: z.string().optional(),
     bairro: z.string().min(1, "Bairro obrigatório"),
     cidade: z.string().min(1, "Cidade obrigatória"),
-    estado: z.string().length(2, "Estado deve ter 2 letras"),
     cep: z
       .string()
       .regex(/^\d{8}$/, "CEP deve ter 8 dígitos")

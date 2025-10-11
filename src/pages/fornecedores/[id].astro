@@ -1,16 +1,22 @@
 ---
 // src/pages/fornecedores/[id].astro
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
-import PerfilFornecedor from '../../components/fornecedores/PerfilFornecedor';
+import VisualizarFornecedor from '../../components/fornecedores/VisualizarFornecedor'; // Importação atualizada
 
-// Esta é uma rota dinâmica no Astro, o [id] será o parâmetro da URL.
-// Não precisamos de getStaticPaths aqui se quisermos que seja SSR ou dinâmico para mock.
-// Se fosse um site estático pré-gerado para todos os fornecedores, usaríamos getStaticPaths.
+// --- Bloco getStaticPaths (permanece o mesmo) ---
+export async function getStaticPaths() {
+  const fornecedorIds = ['f1', 'f2', 'f3'];
 
-// Para fins de demonstração com mock, passamos o ID diretamente.
+  return fornecedorIds.map(id => ({
+    params: { id: id },
+  }));
+}
+// --- Fim do Bloco getStaticPaths ---
+
+
 const { id } = Astro.params;
 ---
 
 <DashboardLayout title={`Fornecedor: ${id}`}>
-  <PerfilFornecedor client:load fornecedorId={id!} />
+  <VisualizarFornecedor client:load fornecedorId={id!} />
 </DashboardLayout>

@@ -5,12 +5,24 @@
     "**/*",
     "src/**/*.astro",
     "src/**/*.ts",
-    "src/**/*.tsx"
+    "src/**/*.tsx",
+    "*.d.ts"
   ],
-  "exclude": ["dist"],
+  "exclude": ["node_modules", "dist"],
   "compilerOptions": {
-    "jsx": "react-jsx",
-    "jsxImportSource": "react",
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "noEmit": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler", // Ou "Node" em projetos mais antigos
+    "jsx": "react-jsx", // Ou "preserve", "react" - Astro é flexível
+    "jsxImportSource": "react", // Importante para componentes React/TSX
+    "allowJs": true,
+    "checkJs": true,
+    "lib": ["ESNext", "DOM"], // Garante que tipos do DOM sejam reconhecidos
+    "types": ["astro/client"], // <--- ESTE É CRUCIAL para arquivos .astro
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]

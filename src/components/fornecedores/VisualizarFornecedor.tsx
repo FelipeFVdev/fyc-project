@@ -1,9 +1,8 @@
-// src/components/fornecedores/PerfilFornecedor.tsx
-import { Fornecedor, Venda, ItemConsignacao } from "@/types";
+import React, { useState } from "react"; // Explicitamente React
+import type { Fornecedor, Venda, ItemConsignacao } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
@@ -15,14 +14,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ExternalLink } from "lucide-react";
-import { useState } from "react";
 
-interface PerfilFornecedorProps {
+import DialogEditarFornecedor from "./DialogEditarFornecedor";
+
+interface VisualizarFornecedorProps {
   fornecedorId: string;
 }
 
-// Mock de dados para um fornecedor específico
-const mockFornecedor: Fornecedor = {
+const initialMockFornecedor: Fornecedor = {
   id: "f1",
   nome: "Maria da Silva",
   cpf: "11122233344",
@@ -34,7 +33,6 @@ const mockFornecedor: Fornecedor = {
     complemento: "Apto 10",
     bairro: "Centro",
     cidade: "São Paulo",
-    estado: "SP",
     cep: "01000000",
   },
   tamanhoPreferencia: ["M", "G", "40"],
@@ -44,7 +42,6 @@ const mockFornecedor: Fornecedor = {
   senha: "hashed_password_example",
 };
 
-// Mock de itens consignados da Maria
 const mockItensConsignados: ItemConsignacao[] = [
   {
     id: "ic1",
@@ -87,7 +84,6 @@ const mockItensConsignados: ItemConsignacao[] = [
   },
 ];
 
-// Mock de vendas para simular o histórico
 const mockHistoricoVendas: Venda[] = [
   {
     id: "v1",
@@ -126,12 +122,11 @@ const mockHistoricoVendas: Venda[] = [
   },
 ];
 
-export default function PerfilFornecedor({
+export default function VisualizarFornecedor({
   fornecedorId,
-}: PerfilFornecedorProps) {
-  // Em um app real, você buscaria o fornecedor e seus dados reais com base no fornecedorId
-  const [fornecedor] = useState<Fornecedor | null>(
-    fornecedorId === "f1" ? mockFornecedor : null
+}: VisualizarFornecedorProps) {
+  const [fornecedor, setFornecedor] = useState<Fornecedor | null>(
+    fornecedorId === "f1" ? initialMockFornecedor : null
   );
   const [itensConsignados] = useState<ItemConsignacao[]>(mockItensConsignados);
   const [historicoVendas] = useState<Venda[]>(mockHistoricoVendas);
@@ -153,120 +148,17 @@ export default function PerfilFornecedor({
     );
   }
 
-  // Função para formatar CPF para exibição
-  const formatCpfDisplay = (cpf: string) => {
-    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-  };
-
-  // Função para formatar Telefone para exibição
-  const formatTelefoneDisplay = (telefone: string) => {
-    const cleaned = telefone.replace(/\D/g, "");
-    if (cleaned.length === 11) {
-      return `(${cleaned.substring(0, 2)}) ${cleaned.substring(
-        2,
-        7
-      )}-${cleaned.substring(7, 11)}`;
-    } else if (cleaned.length === 10) {
-      return `(${cleaned.substring(0, 2)}) ${cleaned.substring(
-        2,
-        6
-      )}-${cleaned.substring(6, 10)}`;
-    }
-    return telefone;
+  const handleFornecedorUpdate = (updatedFornecedor: Fornecedor) => {
+    setFornecedor(updatedFornecedor);
   };
 
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-extrabold text-gray-900">
-          Perfil do Fornecedor: {fornecedor.nome}
+          Informações do Fornecedor
         </h1>
-        <div className="flex gap-4">
-          <Button variant="outline">Editar Fornecedor</Button>
-          <Button variant="destructive">Excluir Fornecedor</Button>
-        </div>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Informações Gerais</CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 text-gray-700">
-          <div>
-            <p className="font-semibold">ID:</p>
-            <p>{fornecedor.id}</p>
-          </div>
-          <div>
-            <p className="font-semibold">CPF:</p>
-            <p>{formatCpfDisplay(fornecedor.cpf)}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Telefone:</p>
-            <p>{formatTelefoneDisplay(fornecedor.telefone)}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Email:</p>
-            <p>{fornecedor.email || "Não informado"}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Status:</p>
-            <Badge
-              variant={fornecedor.status === "ativo" ? "default" : "secondary"}
-            >
-              {fornecedor.status === "ativo" ? "Ativo" : "Inativo"}
-            </Badge>
-          </div>
-          <div>
-            <p className="font-semibold">Data de Cadastro:</p>
-            <p>
-              {format(fornecedor.dataCadastro, "dd/MM/yyyy", { locale: ptBR })}
-            </p>
-          </div>
-          <div>
-            <p className="font-semibold">Vendas Totais:</p>
-            <p>{fornecedor.numeroVendas}</p>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Endereço</CardTitle>
-        </CardHeader>
-        <CardContent className="text-gray-700">
-          <p>
-            {fornecedor.endereco.rua}, {fornecedor.endereco.numero}{" "}
-            {fornecedor.endereco.complemento
-              ? `- ${fornecedor.endereco.complemento}`
-              : ""}
-          </p>
-          <p>
-            {fornecedor.endereco.bairro}, {fornecedor.endereco.cidade} -{" "}
-            {fornecedor.endereco.estado}
-          </p>
-          <p>
-            CEP: {fornecedor.endereco.cep.replace(/^(\d{5})(\d{3})$/, "$1-$2")}
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Preferências e Notas</CardTitle>
-        </CardHeader>
-        <CardContent className="text-gray-700">
-          <div>
-            <p className="font-semibold">Tamanhos de Preferência:</p>
-            <p>
-              {fornecedor.tamanhoPreferencia &&
-              fornecedor.tamanhoPreferencia.length > 0
-                ? fornecedor.tamanhoPreferencia.join(", ")
-                : "Nenhum informado"}
-            </p>
-          </div>
-          {/* Adicionar campo de notas se houver no futuro */}
-        </CardContent>
-      </Card>
 
       <Card>
         <CardHeader>
@@ -402,8 +294,6 @@ export default function PerfilFornecedor({
           </Table>
         </CardContent>
       </Card>
-
-      {/* Adicionar seção para extrato financeiro/pagamentos pendentes aqui no futuro */}
     </div>
   );
 }
