@@ -1,0 +1,11 @@
+---
+// src/pages/garimpo/index.astro
+// import "../../styles/global.css";
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import ListaItensGarimpo from '../../components/garimpo/ListaItensGarimpo';
+---
+
+<DashboardLayout title="Itens de Garimpo">
+  <h1 class="text-3xl font-bold mb-8">Gestão de Itens de Garimpo</h1>
+  <ListaItensGarimpo client:load />
+</DashboardLayout>

@@ -8,6 +8,7 @@ import {
   Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react"; // Importar useEffect e useState
 
 interface SidebarProps {
   userType: "admin" | "fornecedor";
@@ -36,7 +37,17 @@ const fornecedorLinks = [
 
 export default function Sidebar({ userType }: SidebarProps) {
   const links = userType === "admin" ? adminLinks : fornecedorLinks;
-  const currentPath = window.location.pathname;
+
+  // 1. Inicialize currentPath com uma string vazia no servidor
+  // 2. Atualize-o com window.location.pathname APENAS quando o componente montar no cliente
+  const [currentPath, setCurrentPath] = useState("");
+
+  useEffect(() => {
+    // Este código só será executado no navegador após a montagem
+    if (typeof window !== "undefined") {
+      setCurrentPath(window.location.pathname);
+    }
+  }, []); // O array vazio garante que o efeito só rode uma vez, na montagem
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200 p-4">
@@ -49,6 +60,7 @@ export default function Sidebar({ userType }: SidebarProps) {
       <nav className="space-y-2">
         {links.map((link) => {
           const Icon = link.icon;
+          // Use currentPath do estado, que será populado no cliente
           const isActive = currentPath === link.href;
 
           return (
