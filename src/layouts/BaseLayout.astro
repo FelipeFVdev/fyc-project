@@ -1,0 +1,22 @@
+---
+// src/layouts/BaseLayout.astro
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title = 'FYC', description = 'Sistema de Gestão de Brechó' } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} | Brechó System</title>
+    <meta name="description" content={description} />
+  </head>
+  <body class="min-h-screen bg-gray-50">
+    <slot />
+  </body>
+</html>
