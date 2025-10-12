@@ -143,7 +143,7 @@ export default function FormItemConsignacao({
   if (isLoadingFornecedores) {
     return (
       <div className="flex justify-center items-center h-48">
-        <p className="text-xl text-neutral-700">Carregando fornecedores...</p>
+        <p className="text-xl ">Carregando fornecedores...</p>
       </div>
     );
   }
@@ -183,7 +183,7 @@ export default function FormItemConsignacao({
                         fornecedor // Usar 'fornecedores' do useQuery
                       ) => (
                         <SelectItem key={fornecedor.id} value={fornecedor.id}>
-                          {fornecedor.nome} (CPF:{" "}
+                          {fornecedor.nome} (CPF:
                           {fornecedor.cpf.substring(0, 3)}...)
                         </SelectItem>
                       )

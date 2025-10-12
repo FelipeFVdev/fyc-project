@@ -90,9 +90,7 @@ export default function ItemConsignacaoDetalhes({
   if (isLoadingGlobal) {
     return (
       <div className="flex justify-center items-center h-48">
-        <p className="text-xl text-neutral-700">
-          Carregando detalhes do item...
-        </p>
+        <p className="text-xl ">Carregando detalhes do item...</p>
       </div>
     );
   }
@@ -110,7 +108,7 @@ export default function ItemConsignacaoDetalhes({
         <h1 className="text-3xl font-bold mb-4">
           Item consignado não encontrado ou erro.
         </h1>
-        <p className="text-lg text-neutral-600">
+        <p className="text-lg ">
           Não foi possível carregar os detalhes do item. Verifique o ID ou tente
           novamente.
         </p>
@@ -202,7 +200,7 @@ export default function ItemConsignacaoDetalhes({
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 text-neutral-700">
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 ">
           <div>
             <p className="font-semibold">Código do Fornecedor:</p>
             <p>{item.codigoFornecedor}</p>

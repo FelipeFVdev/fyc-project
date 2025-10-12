@@ -220,9 +220,7 @@ export default function GestaoConsignacao() {
   if (isLoadingItens || isLoadingFornecedores) {
     return (
       <div className="flex justify-center items-center h-48">
-        <p className="text-xl text-neutral-700">
-          Carregando itens e fornecedores...
-        </p>
+        <p className="text-xl ">Carregando itens e fornecedores...</p>
       </div>
     );
   }
@@ -251,7 +249,7 @@ export default function GestaoConsignacao() {
 
       <div className="flex gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 " />
           <Input
             placeholder="Buscar por marca, categoria, código ou fornecedor..."
             value={busca}
@@ -269,7 +267,7 @@ export default function GestaoConsignacao() {
               }
             >
               <Filter className="mr-2 h-4 w-4" />
-              Status:{" "}
+              Status:
               {filtroStatus === "todos"
                 ? "Todos"
                 : filtroStatus === "disponivel"
@@ -327,10 +325,7 @@ export default function GestaoConsignacao() {
           <TableBody>
             {itensFiltrados.length === 0 ? (
               <TableRow>
-                <TableCell
-                  colSpan={10}
-                  className="text-center py-8 text-neutral-500"
-                >
+                <TableCell colSpan={10} className="text-center py-8 ">
                   Nenhum item consignado encontrado.
                 </TableCell>
               </TableRow>

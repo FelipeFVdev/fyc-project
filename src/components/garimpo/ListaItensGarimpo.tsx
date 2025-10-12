@@ -108,9 +108,7 @@ export default function ListaItensGarimpo() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-48">
-        <p className="text-xl text-neutral-700">
-          Carregando itens de garimpo...
-        </p>
+        <p className="text-xl ">Carregando itens de garimpo...</p>
       </div>
     );
   }
@@ -140,7 +138,7 @@ export default function ListaItensGarimpo() {
 
       <div className="flex gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 " />
           <Input
             placeholder="Buscar por marca ou categoria..."
             value={busca}
@@ -157,7 +155,7 @@ export default function ListaItensGarimpo() {
               disabled={isLoading || deleteItemMutation.isPending}
             >
               <Filter className="mr-2 h-4 w-4" />
-              Status:{" "}
+              Status:
               {filtroStatus === "todos"
                 ? "Todos"
                 : filtroStatus === "disponivel"
@@ -197,10 +195,7 @@ export default function ListaItensGarimpo() {
           <TableBody>
             {itensFiltrados.length === 0 ? (
               <TableRow>
-                <TableCell
-                  colSpan={9}
-                  className="text-center py-8 text-neutral-500"
-                >
+                <TableCell colSpan={9} className="text-center py-8 ">
                   Nenhum item de garimpo encontrado.
                 </TableCell>
               </TableRow>

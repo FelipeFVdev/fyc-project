@@ -1,4 +1,6 @@
 // src/components/Sidebar.tsx
+"use client";
+
 import {
   Home,
   Package,
@@ -6,10 +8,15 @@ import {
   ShoppingCart,
   FileText,
   Settings,
+  StoreIcon,
+  // Não precisamos mais de Sun/Moon aqui, pois AnimatedThemeToggler os gerencia
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
-import { useEffect, useState } from "react"; // Importar useEffect e useState
+// --- IMPORTAR AnimatedThemeToggler ---
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler"; // Este arquivo permanece intocado
+import { useEffect, useState } from "react";
+// --- useTheme não é mais necessário aqui se o ícone do tema não muda no h1 ---
+// import { useTheme } from "next-themes";
 
 interface SidebarProps {
   userType: "admin" | "fornecedor";
@@ -38,30 +45,44 @@ const fornecedorLinks = [
 
 export default function Sidebar({ userType }: SidebarProps) {
   const links = userType === "admin" ? adminLinks : fornecedorLinks;
-
-  // 1. Inicialize currentPath com uma string vazia no servidor
-  // 2. Atualize-o com window.location.pathname APENAS quando o componente montar no cliente
   const [currentPath, setCurrentPath] = useState("");
+  // const { theme, setTheme } = useTheme(); // Removido, a menos que haja outra necessidade
 
   useEffect(() => {
-    // Este código só será executado no navegador após a montagem
     if (typeof window !== "undefined") {
       setCurrentPath(window.location.pathname);
     }
-  }, []); // O array vazio garante que o efeito só rode uma vez, na montagem
+  }, []);
 
   return (
-    <aside className="w-64 bg-neutral-100 border-r border-neutral-200 dark:bg-neutral-800 dark:border-neutral-700 p-4">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">
-          {userType === "admin" ? "FYC Admin" : "Minha Conta"}
-        </h1>
-      </div>
+    <aside className="w-64 bg-neutral-100 border-r border-neutral-200 dark:bg-neutral-800 dark:border-neutral-700 p-4 flex flex-col justify-between">
+      {/* --- BLOCO DO TÍTULO ESTILIZADO (como na imagem) --- */}
 
-      <nav className="space-y-2">
+      <div className="flex w-full items-center justify-between gap-2 mb-2">
+        <a href="/" className="block w-full">
+          <div className="flex items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none hover:cursor-pointer hover:bg-neutral-300 dark:hover:bg-neutral-700 transition-colors">
+            <div
+              className="flex aspect-square size-10 items-center justify-center rounded-lg bg-blue-600"
+              aria-hidden="true"
+            >
+              <StoreIcon className="size-6 text-white" />
+            </div>
+            <div className="flex flex-col leading-none">
+              <span className="text-base font-semibold">Find Your Clothes</span>{" "}
+              <span className="text-xs text-neutral-600 dark:text-neutral-400">
+                Brecho
+              </span>
+            </div>
+          </div>
+        </a>
+        <AnimatedThemeToggler />
+      </div>
+      {/* --- FIM BLOCO DO TÍTULO --- */}
+
+      <nav className="space-y-2 flex-1">
+        {/* flex-1 para ocupar espaço restante */}
         {links.map((link) => {
           const Icon = link.icon;
-          // Use currentPath do estado, que será populado no cliente
           const isActive = currentPath === link.href;
 
           return (
@@ -71,8 +92,8 @@ export default function Sidebar({ userType }: SidebarProps) {
               className={cn(
                 "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
                 isActive
-                  ? "bg-neutral-900 text-white"
-                  : "text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-700"
+                  ? "bg-neutral-300 text-neutral-800 dark:text-white dark:bg-neutral-700"
+                  : "text-neutral-800 hover:bg-neutral-300 dark:text-neutral-200 dark:hover:bg-neutral-700"
               )}
             >
               <Icon className="w-5 h-5" />
@@ -83,8 +104,6 @@ export default function Sidebar({ userType }: SidebarProps) {
       </nav>
 
       <div className="mt-auto pt-8 border-t border-neutral-200 dark:border-neutral-700">
-        {" "}
-        {/* Linha divisória */}
         {userType === "admin" && (
           <a
             href="/settings"
@@ -94,10 +113,7 @@ export default function Sidebar({ userType }: SidebarProps) {
             <span className="font-medium">Configurações</span>
           </a>
         )}
-        <div className="flex items-center gap-3 px-4 py-3 text-neutral-700 hover:bg-neutral-100 rounded-lg transition-colors dark:text-neutral-200 dark:hover:bg-neutral-700">
-          <AnimatedThemeToggler />
-          <span className="font-medium">Tema</span>
-        </div>
+        {/* REMOVIDO: O bloco DropdownMenu que eu adicionei para o item "Tema" */}
       </div>
     </aside>
   );

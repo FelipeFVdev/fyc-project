@@ -79,9 +79,7 @@ export default function VisualizarFornecedor({
   if (isLoadingFornecedor || isLoadingItensConsignados || isLoadingVendas) {
     return (
       <div className="flex justify-center items-center h-48">
-        <p className="text-xl text-neutral-700">
-          Carregando perfil do fornecedor...
-        </p>
+        <p className="text-xl ">Carregando perfil do fornecedor...</p>
       </div>
     );
   }
@@ -104,7 +102,7 @@ export default function VisualizarFornecedor({
         <h1 className="text-3xl font-bold mb-4">
           Fornecedor não encontrado ou erro.
         </h1>
-        <p className="text-lg text-neutral-600">
+        <p className="text-lg ">
           Não foi possível carregar o perfil do fornecedor. Verifique o ID ou
           tente novamente.
         </p>
@@ -174,12 +172,10 @@ export default function VisualizarFornecedor({
     <div className="space-y-8">
       <div className="flex justify-between items-center mb-8">
         <div className="space-y-4">
-          <h1 className="text-4xl font-extrabold text-neutral-900">
+          <h1 className="text-4xl font-extrabold ">
             Informações do Fornecedor:
           </h1>
-          <p className="text-2xl font-extrabold text-neutral-900">
-            {fornecedor.nome}
-          </p>
+          <p className="text-2xl font-extrabold ">{fornecedor.nome}</p>
         </div>
         <div className="flex gap-4">
           <a href={`/fornecedores/extrato/${fornecedor.id}`}>
@@ -209,10 +205,7 @@ export default function VisualizarFornecedor({
             <TableBody>
               {itensConsignadosDoFornecedor.length === 0 ? (
                 <TableRow>
-                  <TableCell
-                    colSpan={7}
-                    className="text-center py-4 text-neutral-500"
-                  >
+                  <TableCell colSpan={7} className="text-center py-4 ">
                     Nenhum item consignado para este fornecedor.
                   </TableCell>
                 </TableRow>
@@ -288,7 +281,7 @@ export default function VisualizarFornecedor({
                         .filter((item) => item.tipo === "consignacao")
                         .map((item, index) => (
                           <div key={index}>
-                            <Badge variant="outline">{item.itemId}</Badge> (R${" "}
+                            <Badge variant="outline">{item.itemId}</Badge> (R$
                             {item.precoVenda.toFixed(2)})
                           </div>
                         ))}

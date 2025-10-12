@@ -94,7 +94,7 @@ export default function ListaClientes() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-48">
-        <p className="text-xl text-neutral-700">Carregando clientes...</p>
+        <p className="text-xl ">Carregando clientes...</p>
       </div>
     );
   }
@@ -123,7 +123,7 @@ export default function ListaClientes() {
 
       <div className="flex gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 " />
           <Input
             placeholder="Buscar por nome, CPF, telefone ou email..."
             value={busca}
@@ -167,10 +167,7 @@ export default function ListaClientes() {
           <TableBody>
             {clientesFiltrados.length === 0 ? (
               <TableRow>
-                <TableCell
-                  colSpan={7}
-                  className="text-center py-8 text-neutral-500"
-                >
+                <TableCell colSpan={7} className="text-center py-8 ">
                   Nenhum cliente encontrado.
                 </TableCell>
               </TableRow>
@@ -217,7 +214,7 @@ export default function ListaClientes() {
                           }
                         >
                           Editar
-                        </DropdownMenuItem>{" "}
+                        </DropdownMenuItem>
                         {/* Toast provisório */}
                         <DropdownMenuItem
                           onClick={() => handleDelete(cliente.id, cliente.nome)}

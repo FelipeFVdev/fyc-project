@@ -137,8 +137,7 @@ export default function FormEditarFornecedor({
             name="endereco.cep"
             render={({ field }) => (
               <FormItem>
-                {" "}
-                <FormLabel>CEP</FormLabel>{" "}
+                <FormLabel>CEP</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="00000-000"
@@ -146,8 +145,8 @@ export default function FormEditarFornecedor({
                     onChange={(e) => field.onChange(formatCep(e.target.value))}
                     maxLength={9}
                   />
-                </FormControl>{" "}
-                <FormMessage />{" "}
+                </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -156,12 +155,11 @@ export default function FormEditarFornecedor({
             name="endereco.rua"
             render={({ field }) => (
               <FormItem>
-                {" "}
-                <FormLabel>Rua</FormLabel>{" "}
+                <FormLabel>Rua</FormLabel>
                 <FormControl>
                   <Input {...field} />
-                </FormControl>{" "}
-                <FormMessage />{" "}
+                </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -170,12 +168,11 @@ export default function FormEditarFornecedor({
             name="endereco.numero"
             render={({ field }) => (
               <FormItem>
-                {" "}
-                <FormLabel>Número</FormLabel>{" "}
+                <FormLabel>Número</FormLabel>
                 <FormControl>
                   <Input {...field} />
-                </FormControl>{" "}
-                <FormMessage />{" "}
+                </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -184,12 +181,11 @@ export default function FormEditarFornecedor({
             name="endereco.complemento"
             render={({ field }) => (
               <FormItem>
-                {" "}
-                <FormLabel>Complemento</FormLabel>{" "}
+                <FormLabel>Complemento</FormLabel>
                 <FormControl>
                   <Input {...field} />
-                </FormControl>{" "}
-                <FormMessage />{" "}
+                </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -198,12 +194,11 @@ export default function FormEditarFornecedor({
             name="endereco.bairro"
             render={({ field }) => (
               <FormItem>
-                {" "}
-                <FormLabel>Bairro</FormLabel>{" "}
+                <FormLabel>Bairro</FormLabel>
                 <FormControl>
                   <Input {...field} />
-                </FormControl>{" "}
-                <FormMessage />{" "}
+                </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -212,12 +207,11 @@ export default function FormEditarFornecedor({
             name="endereco.cidade"
             render={({ field }) => (
               <FormItem>
-                {" "}
-                <FormLabel>Cidade</FormLabel>{" "}
+                <FormLabel>Cidade</FormLabel>
                 <FormControl>
                   <Input {...field} />
-                </FormControl>{" "}
-                <FormMessage />{" "}
+                </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -268,7 +262,6 @@ export default function FormEditarFornecedor({
         />
 
         <div className="flex justify-end gap-2 mt-8">
-          {" "}
           {/* Removido DialogFooter, agora é um div normal */}
           <Button
             type="button"

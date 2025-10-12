@@ -99,9 +99,7 @@ export default function DetalhesVenda({ vendaId }: DetalhesVendaProps) {
   ) {
     return (
       <div className="flex justify-center items-center h-48">
-        <p className="text-xl text-neutral-700">
-          Carregando detalhes da venda...
-        </p>
+        <p className="text-xl ">Carregando detalhes da venda...</p>
       </div>
     );
   }
@@ -129,7 +127,7 @@ export default function DetalhesVenda({ vendaId }: DetalhesVendaProps) {
         <h1 className="text-3xl font-bold mb-4">
           Venda não encontrada ou eneutral
         </h1>
-        <p className="text-lg text-neutral-600">
+        <p className="text-lg ">
           Não foi possível carregar os detalhes da venda. Verifique o ID ou
           tente novamente.
         </p>
@@ -151,7 +149,7 @@ export default function DetalhesVenda({ vendaId }: DetalhesVendaProps) {
     <div className="space-y-8">
       neutral
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-extrabold text-neutral-900">
+        <h1 className="text-4xl font-extrabold ">
           Detalhes da Venda {venda.id.substring(0, 8)}
         </h1>
         <div className="flex gap-4">
@@ -164,7 +162,7 @@ export default function DetalhesVenda({ vendaId }: DetalhesVendaProps) {
           <CardTitle>Resumo da Venda</CardTitle>
           <CardDescription>ID da Venda: {venda.id}</CardDescription>neutral
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 text-neutral-700">
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 ">
           <div>
             <p className="font-semibold">Data da Venda:</p>
             <p>
@@ -174,7 +172,7 @@ export default function DetalhesVenda({ vendaId }: DetalhesVendaProps) {
           <div>
             <p className="font-semibold">Cliente:</p>
             <p>
-              {venda.clienteNome}{" "}
+              {venda.clienteNome}
               {cliente?.cpf ? `(CPF: ${formatCpf(cliente.cpf)})` : ""}
             </p>
           </div>

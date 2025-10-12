@@ -100,9 +100,7 @@ export default function ListaVendas() {
   if (isLoadingVendas || isLoadingClientes) {
     return (
       <div className="flex justify-center items-center h-48">
-        <p className="text-xl text-neutral-700">
-          Carregando vendas e clientes...
-        </p>
+        <p className="text-xl ">Carregando vendas e clientes...</p>
       </div>
     );
   }
@@ -127,7 +125,7 @@ export default function ListaVendas() {
 
       <div className="flex gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 " />
           <Input
             placeholder="Buscar por cliente, ID da venda ou item..."
             value={busca}
@@ -140,7 +138,7 @@ export default function ListaVendas() {
           <DropdownMenuTrigger asChild>
             <Button variant="outline">
               <Filter className="mr-2 h-4 w-4" />
-              Pagamento:{" "}
+              Pagamento:
               {filtroPagamento === "todos"
                 ? "Todos"
                 : filtroPagamento === "credito_loja"
@@ -188,10 +186,7 @@ export default function ListaVendas() {
           <TableBody>
             {vendasFiltradas.length === 0 ? (
               <TableRow>
-                <TableCell
-                  colSpan={8}
-                  className="text-center py-8 text-neutral-500"
-                >
+                <TableCell colSpan={8} className="text-center py-8 ">
                   Nenhuma venda encontrada.
                 </TableCell>
               </TableRow>
@@ -208,8 +203,8 @@ export default function ListaVendas() {
                     {venda.clienteNome}
                     {venda.clienteId &&
                       clienteMap.get(venda.clienteId)?.cpf && (
-                        <p className="text-xs text-neutral-500">
-                          (CPF:{" "}
+                        <p className="text-xs ">
+                          (CPF:
                           {formatCpf(clienteMap.get(venda.clienteId)!.cpf!)})
                         </p>
                       )}

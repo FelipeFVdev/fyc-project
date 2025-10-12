@@ -317,7 +317,7 @@ export default function FormVenda() {
                       </SelectItem>
                       {clientes?.map((cliente) => (
                         <SelectItem key={cliente.id} value={cliente.id}>
-                          {cliente.nome}{" "}
+                          {cliente.nome}
                           {cliente.cpf
                             ? `(CPF: ${formatCpf(cliente.cpf)})`
                             : ""}
@@ -444,7 +444,7 @@ export default function FormVenda() {
                         />
                       </TableCell>
                       <TableCell>
-                        R${" "}
+                        R$
                         {selectedItem
                           ? selectedItem.precoVenda.toFixed(2)
                           : "0.00"}
@@ -482,14 +482,14 @@ export default function FormVenda() {
             </Button>
           </div>
 
-          <div className="bg-neutral-50 p-6 rounded-lg space-y-2">
+          <div className="-50 p-6 rounded-lg space-y-2">
             <h3 className="font-semibold text-xl mb-4">Resumo Financeiro</h3>
             <div className="flex justify-between">
-              <span className="text-neutral-600">Valor Total dos Itens:</span>
+              <span className="">Valor Total dos Itens:</span>
               <span className="font-bold">R$ {valorTotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-neutral-600">Custo Total (para loja):</span>
+              <span className="">Custo Total (para loja):</span>
               <span className="font-bold">R$ {custoTotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-lg font-bold border-t pt-2 mt-2">
