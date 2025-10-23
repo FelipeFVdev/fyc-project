@@ -10,9 +10,7 @@ import { getFornecedores } from '../../lib/db'; // <-- Importe a função getFor
 
 // getStaticPaths para gerar páginas para cada fornecedor
 export async function getStaticPaths() {
-  // --- CHAME A FUNÇÃO ASSÍNCRONA DE FETCH AQUI ---
-  const fornecedores = await getFornecedores(); // <--- CHAME A FUNÇÃO!
-  // --- FIM DA CHAMADA ---
+  const fornecedores = await getFornecedores();
 
   return fornecedores.map(fornecedor => ({
     params: { id: fornecedor.id },

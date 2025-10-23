@@ -61,21 +61,22 @@ export default function Sidebar({ userType }: SidebarProps) {
       <div className="flex w-full items-center justify-between gap-2 mb-2">
         <a href="/" className="block w-full">
           <div className="flex items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none hover:cursor-pointer hover:bg-neutral-300 dark:hover:bg-neutral-700 transition-colors">
-            <div
-              className="flex aspect-square size-10 items-center justify-center rounded-lg bg-blue-600"
-              aria-hidden="true"
-            >
-              <StoreIcon className="size-6 text-white" />
+            <div className="size-16" aria-hidden="true">
+              <img
+                src="/logo-fyc-sem-fundo.png"
+                alt="FYC Brechó Logo"
+                className="bg-white size-full object-contain rounded-4xl"
+              />
             </div>
             <div className="flex flex-col leading-none">
               <span className="text-base font-semibold">Find Your Clothes</span>{" "}
               <span className="text-xs text-neutral-600 dark:text-neutral-400">
-                Brecho
+                Brecho | Admin
               </span>
             </div>
           </div>
         </a>
-        <AnimatedThemeToggler />
+        {/* <AnimatedThemeToggler /> */}
       </div>
       {/* --- FIM BLOCO DO TÍTULO --- */}
 
@@ -113,7 +114,6 @@ export default function Sidebar({ userType }: SidebarProps) {
             <span className="font-medium">Configurações</span>
           </a>
         )}
-        {/* REMOVIDO: O bloco DropdownMenu que eu adicionei para o item "Tema" */}
       </div>
     </aside>
   );

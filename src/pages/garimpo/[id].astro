@@ -1,0 +1,24 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import ItemGarimpoDetalhes from '../../components/garimpo/ItemGarimpoDetalhes';
+
+import { getItensGarimpo } from '../../lib/db';
+
+// getStaticPaths é necessário para rotas dinâmicas em Astro
+export async function getStaticPaths() {
+  // --- CHAME A FUNÇÃO ASSÍNCRONA DE FETCH AQUI ---
+  const itens = await getItensGarimpo(); // <--- CHAME A FUNÇÃO!
+
+  return itens.map(item => ({
+    params: { id: item.id },
+  }));
+}
+
+const { id } = Astro.params;
+---
+
+<DashboardLayout title={`Detalhes do Item de Garimpo: ${id.substring(0, 8)}`}>
+  <h1 class="text-3xl font-bold mb-8">Detalhes do Item de Garimpo</h1>
+  
+  <ItemGarimpoDetalhes client:load itemId={id!} /> {/* Passa o ID para o componente */}
+</DashboardLayout>

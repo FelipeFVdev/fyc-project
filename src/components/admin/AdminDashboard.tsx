@@ -17,7 +17,7 @@ const dashboardData = {
 export default function AdminDashboard() {
   return (
     <div className="space-y-8">
-      <h1 className="text-4xl font-extrabold  mb-6">Dashboard Admin</h1>
+      <h1 className="text-4xl font-bold mb-6">Dashboard Admin</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
