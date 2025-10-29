@@ -22,10 +22,10 @@ const { title = 'FYC', description = 'Sistema de Gestão de Brechó' } = Astro.p
     <meta name="description" content={description} />
     <link rel="icon" type="image/png" href="/logo-fyc-sem-fundo.png" />
   </head>
-  <body class="min-h-screen bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">
-    <ThemeProvider client:load> {/* client:load é CRUCIAL para este componente React */}
+  <body class="min-h-screen bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">
+    <ThemeProvider client:idle>
       <slot />
-      <Toaster client:load /> {/* Toaster também é React e precisa de client:load */}
+      <Toaster client:idle />
     </ThemeProvider>
   </body>
 </html>

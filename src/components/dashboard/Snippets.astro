@@ -1,0 +1,40 @@
+---
+// src/components/dashboard/Snippets.astro
+interface Snippet {
+  href: string;
+  label: string;
+}
+
+interface Props {
+  snippet?: Snippet[];
+}
+
+const { snippet } = Astro.props;
+
+// Snippet padrão
+const defaultSnippets: Snippet[] = [
+  { href: '/garimpo/novo', label: 'Cadastrar Garimpo' },
+  { href: '/consignacao/novo', label: 'Cadastrar Consignação' },
+  { href: '/vendas/novo', label: 'Registrar Venda' },
+  { href: '/fornecedores/novo', label: 'Novo Fornecedor' },
+];
+
+const snippetsFinal = snippet || defaultSnippets;
+---
+
+<div class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm">
+  <div class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6">
+    <div class="leading-none font-semibold">Atalhos Rápidos</div>
+  </div>
+  <div class="px-6 flex flex-wrap gap-2">
+    {snippetsFinal.map(snippet => (
+      <a
+        href={snippet.href}
+        class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+      >
+        {snippet.label}
+      </a>
+    ))}
+  </div>
+</div>
+

@@ -17,19 +17,17 @@ const dashboardData = {
 export default function AdminDashboard() {
   return (
     <div className="space-y-8">
-      <h1 className="text-4xl font-bold mb-6">Dashboard Admin</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Itens Garimpo</CardTitle>
-            <Package className="h-4 w-4 " />
+            <Package className="h-4 w-4" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {dashboardData.totalItensGarimpo}
             </div>
-            <p className="text-xs ">Total em estoque</p>
+            <p className="text-xs">Total em estoque</p>
           </CardContent>
         </Card>
 
@@ -38,39 +36,39 @@ export default function AdminDashboard() {
             <CardTitle className="text-sm font-medium">
               Consignação Ativa
             </CardTitle>
-            <Users className="h-4 w-4 " />
+            <Users className="h-4 w-4" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {dashboardData.itensConsignacaoAtivos}
             </div>
-            <p className="text-xs ">Itens aguardando venda</p>
+            <p className="text-xs">Itens aguardando venda</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Vendas (Mês)</CardTitle>
-            <ShoppingCart className="h-4 w-4 " />
+            <ShoppingCart className="h-4 w-4" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {dashboardData.vendasMesAtual}
             </div>
-            <p className="text-xs ">Total de transações</p>
+            <p className="text-xs">Total de transações</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Lucro (Mês)</CardTitle>
-            <TrendingUp className="h-4 w-4 " />
+            <TrendingUp className="h-4 w-4" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               R$ {dashboardData.lucroMesAtual.toFixed(2)}
             </div>
-            <p className="text-xs ">
+            <p className="text-xs">
               Faturamento: R$ {dashboardData.faturamentoMesAtual.toFixed(2)}
             </p>
           </CardContent>
@@ -78,7 +76,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Seções adicionais podem ser adicionadas aqui, como gráficos, últimas vendas, etc. */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Novos Registros</CardTitle>

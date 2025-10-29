@@ -1,9 +1,11 @@
 ---
 import "../styles/global.css";
 import DashboardLayout from '../layouts/DashboardLayout.astro';
-import AdminDashboard from '../components/admin/AdminDashboard';
+// import AdminDashboard from '../components/admin/AdminDashboard';
+import AdminDashboard from '../components/admin/AdminDashboard.astro';
 ---
 
-<DashboardLayout title="Dashboard Admin" userType="admin">
-  <AdminDashboard client:load />
+<DashboardLayout userType="admin">
+  <!-- <AdminDashboard client:idle /> -->
+  <AdminDashboard />
 </DashboardLayout>

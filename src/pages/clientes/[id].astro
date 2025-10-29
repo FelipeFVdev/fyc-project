@@ -17,5 +17,5 @@ const { id } = Astro.params;
 ---
 
 <DashboardLayout title={`Cliente: ${id}`}>
-  <VisualizarCliente client:load clienteId={id!} />
+  <VisualizarCliente client:idle clienteId={id!} />
 </DashboardLayout>

@@ -55,17 +55,17 @@ export default function Sidebar({ userType }: SidebarProps) {
   }, []);
 
   return (
-    <aside className="w-64 bg-neutral-100 border-r border-neutral-200 dark:bg-neutral-800 dark:border-neutral-700 p-4 flex flex-col justify-between">
+    <aside className="flex w-64 flex-col justify-between p-4">
       {/* --- BLOCO DO TÍTULO ESTILIZADO (como na imagem) --- */}
 
-      <div className="flex w-full items-center justify-between gap-2 mb-2">
+      <div className="mb-2 flex w-full items-center justify-between gap-2">
         <a href="/" className="block w-full">
-          <div className="flex items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none hover:cursor-pointer hover:bg-neutral-300 dark:hover:bg-neutral-700 transition-colors">
+          <div className="flex items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm transition-colors outline-none hover:cursor-pointer hover:bg-neutral-300 dark:hover:bg-neutral-700">
             <div className="size-16" aria-hidden="true">
               <img
                 src="/logo-fyc-sem-fundo.png"
                 alt="FYC Brechó Logo"
-                className="bg-white size-full object-contain rounded-4xl"
+                className="size-full rounded-4xl bg-white object-contain"
               />
             </div>
             <div className="flex flex-col leading-none">
@@ -80,7 +80,7 @@ export default function Sidebar({ userType }: SidebarProps) {
       </div>
       {/* --- FIM BLOCO DO TÍTULO --- */}
 
-      <nav className="space-y-2 flex-1">
+      <nav className="flex-1 space-y-2">
         {/* flex-1 para ocupar espaço restante */}
         {links.map((link) => {
           const Icon = link.icon;
@@ -91,26 +91,26 @@ export default function Sidebar({ userType }: SidebarProps) {
               key={link.href}
               href={link.href}
               className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+                "flex items-center gap-3 rounded-lg px-4 py-3 transition-colors",
                 isActive
-                  ? "bg-neutral-300 text-neutral-800 dark:text-white dark:bg-neutral-700"
-                  : "text-neutral-800 hover:bg-neutral-300 dark:text-neutral-200 dark:hover:bg-neutral-700"
+                  ? "bg-neutral-300 text-neutral-800 dark:bg-neutral-700 dark:text-white"
+                  : "text-neutral-800 hover:bg-neutral-300 dark:text-neutral-200 dark:hover:bg-neutral-700",
               )}
             >
-              <Icon className="w-5 h-5" />
+              <Icon className="h-5 w-5" />
               <span className="font-medium">{link.label}</span>
             </a>
           );
         })}
       </nav>
 
-      <div className="mt-auto pt-8 border-t border-neutral-200 dark:border-neutral-700">
+      <div className="mt-auto border-t border-neutral-200 pt-8 dark:border-neutral-700">
         {userType === "admin" && (
           <a
             href="/settings"
-            className="flex items-center gap-3 px-4 py-3 text-neutral-700 hover:bg-neutral-100 rounded-lg transition-colors dark:text-neutral-200 dark:hover:bg-neutral-700"
+            className="flex items-center gap-3 rounded-lg px-4 py-3 text-neutral-700 transition-colors hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-700"
           >
-            <Settings className="w-5 h-5" />
+            <Settings className="h-5 w-5" />
             <span className="font-medium">Configurações</span>
           </a>
         )}

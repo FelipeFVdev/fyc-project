@@ -1,0 +1,80 @@
+---
+import { getItensGarimpo, getItensConsignados, getVendas, getFornecedores, getClientes } from '@/lib/db';
+import StatsCard from '@/components/dashboard/StatsCard.astro';
+import NewRegisters from '@/components/dashboard/NewRegisters.astro';
+import Snippets from '@/components/dashboard/Snippets.astro';
+
+// Buscar dados no servidor
+const [itensGarimpo, itensConsignados, vendas, fornecedores, clientes] = await Promise.all([
+  getItensGarimpo(),
+  getItensConsignados(),
+  getVendas(),
+  getFornecedores(),
+  getClientes(),
+]);
+
+// Calcular estatísticas
+const totalItensGarimpo = itensGarimpo.filter(item => item.status === 'disponivel').length;
+const itensConsignacaoAtivos = itensConsignados.filter(item => item.status === 'disponivel').length;
+
+// Vendas do mês atual
+const hoje = new Date();
+const primeiroDiaMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+const vendasMesAtual = vendas.filter(venda => venda.dataVenda >= primeiroDiaMes);
+const faturamentoMesAtual = vendasMesAtual.reduce((sum, venda) => sum + venda.valorTotal, 0);
+const lucroMesAtual = vendasMesAtual.reduce((sum, venda) => sum + venda.margemLucro, 0);
+
+// Novos fornecedores e clientes no mês
+const novosFornecedoresMes = fornecedores.filter(f => f.dataCadastro >= primeiroDiaMes).length;
+const novosClientesMes = clientes.filter(c => c.dataCadastro >= primeiroDiaMes).length;
+
+// Função para formatar valores
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('pt-BR', { 
+    style: 'currency', 
+    currency: 'BRL' 
+  }).format(value);
+};
+---
+
+<div class="space-y-8">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <StatsCard 
+      title="Itens Garimpo" 
+      value={totalItensGarimpo}
+      description="Total em estoque"
+      icon="Package"
+    />
+
+    <StatsCard 
+      title="Consignação Ativa" 
+      value={itensConsignacaoAtivos}
+      description="Itens aguardando venda"
+      icon="Users"
+    />
+
+    <StatsCard 
+      title="Vendas (Mês)" 
+      value={vendasMesAtual.length}
+      description="Total de transações"
+      icon="ShoppingCart"
+    />
+
+    <StatsCard 
+      title="Lucro (Mês)" 
+      value={formatCurrency(lucroMesAtual)}
+      description={`Faturamento: ${formatCurrency(faturamentoMesAtual)}`}
+      icon="TrendingUp"
+    />
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <NewRegisters 
+      newSupplier={novosFornecedoresMes}
+      newClients={novosClientesMes}
+    />
+
+    <Snippets />
+  </div>
+</div>
+

@@ -1,0 +1,26 @@
+---
+// src/components/dashboard/NewRegisters.astro
+interface Props {
+  newSupplier: number;
+  newClients: number;
+}
+
+const { newSupplier, newClients } = Astro.props;
+---
+
+<div class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm">
+  <div class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6">
+    <div class="leading-none font-semibold">Novos Registros</div>
+  </div>
+  <div class="px-6">
+    <p class="mb-2">
+      Fornecedores novos este mês:
+      <span class="font-bold"> {newSupplier}</span>
+    </p>
+    <p>
+      Clientes novos este mês:
+      <span class="font-bold"> {newClients}</span>
+    </p>
+  </div>
+</div>
+
