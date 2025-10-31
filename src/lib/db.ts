@@ -273,6 +273,222 @@ export const _mockHistoricoVendas: Venda[] = [
     margemLucro: 50.0,
     formaPagamento: "cartao",
   },
+  {
+    id: "v3",
+    dataVenda: addDays(now, -10),
+    clienteId: "c1",
+    clienteNome: "Cliente Fidelidade 1",
+    itens: [
+      {
+        itemId: "ic5",
+        tipo: "consignacao",
+        precoVenda: 100.0,
+        custoBase: 50.0,
+      },
+    ],
+    valorTotal: 100.0,
+    custoTotal: 50.0,
+    margemLucro: 50.0,
+    formaPagamento: "cartao",
+  },
+  {
+    id: "v3",
+    dataVenda: addDays(now, -10),
+    clienteId: "c1",
+    clienteNome: "Cliente Fidelidade 1",
+    itens: [
+      {
+        itemId: "ic5",
+        tipo: "consignacao",
+        precoVenda: 100.0,
+        custoBase: 50.0,
+      },
+    ],
+    valorTotal: 100.0,
+    custoTotal: 50.0,
+    margemLucro: 50.0,
+    formaPagamento: "cartao",
+  },
+  {
+    id: "v3",
+    dataVenda: addDays(now, -10),
+    clienteId: "c1",
+    clienteNome: "Cliente Fidelidade 1",
+    itens: [
+      {
+        itemId: "ic5",
+        tipo: "consignacao",
+        precoVenda: 100.0,
+        custoBase: 50.0,
+      },
+    ],
+    valorTotal: 100.0,
+    custoTotal: 50.0,
+    margemLucro: 50.0,
+    formaPagamento: "cartao",
+  },
+  {
+    id: "v3",
+    dataVenda: addDays(now, -10),
+    clienteId: "c1",
+    clienteNome: "Cliente Fidelidade 1",
+    itens: [
+      {
+        itemId: "ic5",
+        tipo: "consignacao",
+        precoVenda: 100.0,
+        custoBase: 50.0,
+      },
+    ],
+    valorTotal: 100.0,
+    custoTotal: 50.0,
+    margemLucro: 50.0,
+    formaPagamento: "cartao",
+  },
+  {
+    id: "v3",
+    dataVenda: addDays(now, -10),
+    clienteId: "c1",
+    clienteNome: "Cliente Fidelidade 1",
+    itens: [
+      {
+        itemId: "ic5",
+        tipo: "consignacao",
+        precoVenda: 100.0,
+        custoBase: 50.0,
+      },
+    ],
+    valorTotal: 100.0,
+    custoTotal: 50.0,
+    margemLucro: 50.0,
+    formaPagamento: "cartao",
+  },
+  {
+    id: "v3",
+    dataVenda: addDays(now, -10),
+    clienteId: "c1",
+    clienteNome: "Cliente Fidelidade 1",
+    itens: [
+      {
+        itemId: "ic5",
+        tipo: "consignacao",
+        precoVenda: 100.0,
+        custoBase: 50.0,
+      },
+    ],
+    valorTotal: 100.0,
+    custoTotal: 50.0,
+    margemLucro: 50.0,
+    formaPagamento: "cartao",
+  },
+  {
+    id: "v3",
+    dataVenda: addDays(now, -10),
+    clienteId: "c1",
+    clienteNome: "Cliente Fidelidade 1",
+    itens: [
+      {
+        itemId: "ic5",
+        tipo: "consignacao",
+        precoVenda: 100.0,
+        custoBase: 50.0,
+      },
+    ],
+    valorTotal: 100.0,
+    custoTotal: 50.0,
+    margemLucro: 50.0,
+    formaPagamento: "cartao",
+  },
+  {
+    id: "v3",
+    dataVenda: addDays(now, -10),
+    clienteId: "c1",
+    clienteNome: "Cliente Fidelidade 1",
+    itens: [
+      {
+        itemId: "ic5",
+        tipo: "consignacao",
+        precoVenda: 100.0,
+        custoBase: 50.0,
+      },
+    ],
+    valorTotal: 100.0,
+    custoTotal: 50.0,
+    margemLucro: 50.0,
+    formaPagamento: "cartao",
+  },
+  {
+    id: "v3",
+    dataVenda: addDays(now, -10),
+    clienteId: "c1",
+    clienteNome: "Cliente Fidelidade 1",
+    itens: [
+      {
+        itemId: "ic5",
+        tipo: "consignacao",
+        precoVenda: 100.0,
+        custoBase: 50.0,
+      },
+    ],
+    valorTotal: 100.0,
+    custoTotal: 50.0,
+    margemLucro: 50.0,
+    formaPagamento: "cartao",
+  },
+  {
+    id: "v3",
+    dataVenda: addDays(now, -10),
+    clienteId: "c1",
+    clienteNome: "Cliente Fidelidade 1",
+    itens: [
+      {
+        itemId: "ic5",
+        tipo: "consignacao",
+        precoVenda: 100.0,
+        custoBase: 50.0,
+      },
+    ],
+    valorTotal: 100.0,
+    custoTotal: 50.0,
+    margemLucro: 50.0,
+    formaPagamento: "cartao",
+  },
+  {
+    id: "v3",
+    dataVenda: addDays(now, -10),
+    clienteId: "c1",
+    clienteNome: "Cliente Fidelidade 1",
+    itens: [
+      {
+        itemId: "ic5",
+        tipo: "consignacao",
+        precoVenda: 100.0,
+        custoBase: 50.0,
+      },
+    ],
+    valorTotal: 100.0,
+    custoTotal: 50.0,
+    margemLucro: 50.0,
+    formaPagamento: "cartao",
+  },
+  {
+    id: "v3",
+    dataVenda: addDays(now, -10),
+    clienteId: "c1",
+    clienteNome: "Cliente Fidelidade 1",
+    itens: [
+      {
+        itemId: "ic5",
+        tipo: "consignacao",
+        precoVenda: 100.0,
+        custoBase: 50.0,
+      },
+    ],
+    valorTotal: 100.0,
+    custoTotal: 50.0,
+    margemLucro: 50.0,
+    formaPagamento: "cartao",
+  },
 ];
 
 export const _mockPagamentos: PagamentoFornecedor[] = [
@@ -306,17 +522,17 @@ export async function getFornecedores(): Promise<Fornecedor[]> {
   return structuredClone(_mockFornecedores); // Retorna uma cópia para evitar mutações diretas
 }
 export async function getFornecedorById(
-  id: string
+  id: string,
 ): Promise<Fornecedor | undefined> {
   await delay(100);
   return structuredClone(_mockFornecedores.find((f) => f.id === id));
 }
 export async function updateFornecedor(
-  updatedFornecedor: Fornecedor
+  updatedFornecedor: Fornecedor,
 ): Promise<Fornecedor> {
   await delay(300);
   const index = _mockFornecedores.findIndex(
-    (f) => f.id === updatedFornecedor.id
+    (f) => f.id === updatedFornecedor.id,
   );
   if (index !== -1) {
     _mockFornecedores[index] = updatedFornecedor;
@@ -324,7 +540,7 @@ export async function updateFornecedor(
   return structuredClone(updatedFornecedor);
 }
 export async function addFornecedor(
-  newFornecedor: Fornecedor
+  newFornecedor: Fornecedor,
 ): Promise<Fornecedor> {
   await delay(300);
   _mockFornecedores.push(newFornecedor);
@@ -338,12 +554,12 @@ export async function deleteFornecedor(id: string): Promise<void> {
   }
 }
 export async function getFornecedorPagamentos(
-  id: string
+  id: string,
 ): Promise<PagamentoFornecedor[]> {
   await delay(200);
   // No mock, vamos gerar pagamentos baseados nos itens vendidos para o fornecedor
   const itensVendidosDoFornecedor = _mockItensConsignados.filter(
-    (item) => item.fornecedorId === id && item.status === "vendido"
+    (item) => item.fornecedorId === id && item.status === "vendido",
   );
 
   const generatedPayments: PagamentoFornecedor[] = [];
@@ -385,19 +601,19 @@ export async function getFornecedorPagamentos(
     generatedPayments.sort(
       (a, b) =>
         (b.dataPagamento || new Date(0)).getTime() -
-        (a.dataPagamento || new Date(0)).getTime()
-    )
+        (a.dataPagamento || new Date(0)).getTime(),
+    ),
   );
 }
 export async function addPagamento(
-  newPayment: PagamentoFornecedor
+  newPayment: PagamentoFornecedor,
 ): Promise<PagamentoFornecedor> {
   await delay(300);
   _mockPagamentos.push(newPayment);
   return structuredClone(newPayment);
 }
 export async function updatePagamento(
-  updatedPayment: PagamentoFornecedor
+  updatedPayment: PagamentoFornecedor,
 ): Promise<PagamentoFornecedor> {
   await delay(300);
   const index = _mockPagamentos.findIndex((p) => p.id === updatedPayment.id);
@@ -413,20 +629,20 @@ export async function getItensGarimpo(): Promise<ItemGarimpo[]> {
   return structuredClone(_mockItensGarimpo);
 }
 export async function getItemGarimpoById(
-  id: string
+  id: string,
 ): Promise<ItemGarimpo | undefined> {
   await delay(100);
   return structuredClone(_mockItensGarimpo.find((i) => i.id === id));
 }
 export async function addItemGarimpo(
-  newItem: ItemGarimpo
+  newItem: ItemGarimpo,
 ): Promise<ItemGarimpo> {
   await delay(300);
   _mockItensGarimpo.push(newItem);
   return structuredClone(newItem);
 }
 export async function updateItemGarimpo(
-  updatedItem: ItemGarimpo
+  updatedItem: ItemGarimpo,
 ): Promise<ItemGarimpo> {
   await delay(300);
   const index = _mockItensGarimpo.findIndex((i) => i.id === updatedItem.id);
@@ -449,20 +665,20 @@ export async function getItensConsignados(): Promise<ItemConsignacao[]> {
   return structuredClone(_mockItensConsignados);
 }
 export async function getItemConsignadoById(
-  id: string
+  id: string,
 ): Promise<ItemConsignacao | undefined> {
   await delay(100);
   return structuredClone(_mockItensConsignados.find((i) => i.id === id));
 }
 export async function addItemConsignado(
-  newItem: ItemConsignacao
+  newItem: ItemConsignacao,
 ): Promise<ItemConsignacao> {
   await delay(300);
   _mockItensConsignados.push(newItem);
   return structuredClone(newItem);
 }
 export async function updateItemConsignado(
-  updatedItem: ItemConsignacao
+  updatedItem: ItemConsignacao,
 ): Promise<ItemConsignacao> {
   await delay(300);
   const index = _mockItensConsignados.findIndex((i) => i.id === updatedItem.id);
@@ -495,13 +711,13 @@ export async function addVenda(newVenda: Venda): Promise<Venda> {
   // Simular atualização de status dos itens vendidos
   newVenda.itens.forEach((vendaItem) => {
     const garimpoItem = _mockItensGarimpo.find(
-      (i) => i.id === vendaItem.itemId
+      (i) => i.id === vendaItem.itemId,
     );
     if (garimpoItem) {
       garimpoItem.status = "vendido";
     }
     const consignadoItem = _mockItensConsignados.find(
-      (i) => i.id === vendaItem.itemId
+      (i) => i.id === vendaItem.itemId,
     );
     if (consignadoItem) {
       consignadoItem.status = "vendido";
@@ -526,7 +742,7 @@ export async function addVenda(newVenda: Venda): Promise<Venda> {
           porcentagem: 40,
           status: "pendente",
           dataPagamento: new Date(),
-        }
+        },
       );
     }
     // Adicionar a venda ao histórico de compras do cliente
@@ -552,7 +768,7 @@ export async function estornarVenda(id: string): Promise<void> {
     const cliente = _mockClientes.find((c) => c.id === estornada.clienteId);
     if (cliente) {
       cliente.historicoCompras = cliente.historicoCompras.filter(
-        (vId) => vId !== estornada.id
+        (vId) => vId !== estornada.id,
       );
     }
   }

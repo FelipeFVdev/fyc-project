@@ -55,10 +55,10 @@ export default function Sidebar({ userType }: SidebarProps) {
   }, []);
 
   return (
-    <aside className="flex w-64 flex-col justify-between p-4">
+    <aside className="flex w-64 flex-col justify-between bg-neutral-50 shadow-lg">
       {/* --- BLOCO DO TÍTULO ESTILIZADO (como na imagem) --- */}
 
-      <div className="mb-2 flex w-full items-center justify-between gap-2">
+      <div className="flex w-full items-center justify-between gap-2 p-4">
         <a href="/" className="block w-full">
           <div className="flex items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm transition-colors outline-none hover:cursor-pointer hover:bg-neutral-300 dark:hover:bg-neutral-700">
             <div className="size-16" aria-hidden="true">
@@ -70,7 +70,7 @@ export default function Sidebar({ userType }: SidebarProps) {
             </div>
             <div className="flex flex-col leading-none">
               <span className="text-base font-semibold">Find Your Clothes</span>{" "}
-              <span className="text-xs text-neutral-600 dark:text-neutral-400">
+              <span className="text-muted-foreground text-xs">
                 Brecho | Admin
               </span>
             </div>
@@ -78,9 +78,11 @@ export default function Sidebar({ userType }: SidebarProps) {
         </a>
         {/* <AnimatedThemeToggler /> */}
       </div>
+
+      <div className="mt-auto border-t border-neutral-200 pt-4 dark:border-neutral-700"></div>
       {/* --- FIM BLOCO DO TÍTULO --- */}
 
-      <nav className="flex-1 space-y-2">
+      <nav className="flex-1 space-y-2 p-4">
         {/* flex-1 para ocupar espaço restante */}
         {links.map((link) => {
           const Icon = link.icon;
@@ -93,18 +95,18 @@ export default function Sidebar({ userType }: SidebarProps) {
               className={cn(
                 "flex items-center gap-3 rounded-lg px-4 py-3 transition-colors",
                 isActive
-                  ? "bg-neutral-300 text-neutral-800 dark:bg-neutral-700 dark:text-white"
+                  ? "bg-neutral-300 text-neutral-800 shadow-lg dark:bg-neutral-700 dark:text-white"
                   : "text-neutral-800 hover:bg-neutral-300 dark:text-neutral-200 dark:hover:bg-neutral-700",
               )}
             >
               <Icon className="h-5 w-5" />
-              <span className="font-medium">{link.label}</span>
+              <span className="text-sm font-medium">{link.label}</span>
             </a>
           );
         })}
       </nav>
 
-      <div className="mt-auto border-t border-neutral-200 pt-8 dark:border-neutral-700">
+      <div className="mt-auto border-t border-neutral-200 p-4 pt-8 dark:border-neutral-700">
         {userType === "admin" && (
           <a
             href="/settings"

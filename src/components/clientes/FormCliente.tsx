@@ -1,7 +1,7 @@
 // src/components/clientes/FormCliente.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { clienteSchema } from "@/lib/validations";
@@ -18,67 +18,92 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import type { Cliente } from "@/types";
 import { z } from "zod";
-import { formatCpf, formatTelefone, formatCep } from "@/lib/utils";
+import { formatCpf, formatTelefone } from "@/lib/utils";
 
-// TanStack Query hooks para adicionar cliente
+// TanStack Query hooks
 import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/store";
-import { addCliente } from "@/lib/db";
+import { addCliente, updateCliente } from "@/lib/db";
 
 type ClienteFormData = z.infer<typeof clienteSchema>;
 
-const estadosBrasileiros = [
-  { value: "AC", label: "Acre" },
-  { value: "AL", label: "Alagoas" },
-  { value: "AP", label: "Amapá" },
-  { value: "AM", label: "Amazonas" },
-  { value: "BA", label: "Bahia" },
-  { value: "CE", label: "Ceará" },
-  { value: "DF", label: "Distrito Federal" },
-  { value: "ES", label: "Espírito Santo" },
-  { value: "GO", label: "Goiás" },
-  { value: "MA", label: "Maranhão" },
-  { value: "MT", label: "Mato Grosso" },
-  { value: "MS", label: "Mato Grosso do Sul" },
-  { value: "MG", label: "Minas Gerais" },
-  { value: "PA", label: "Pará" },
-  { value: "PB", label: "Paraíba" },
-  { value: "PR", label: "Paraná" },
-  { value: "PE", label: "Pernambuco" },
-  { value: "PI", label: "Piauí" },
-  { value: "RJ", label: "Rio de Janeiro" },
-  { value: "RN", label: "Rio Grande do Norte" },
-  { value: "RS", label: "Rio Grande do Sul" },
-  { value: "RO", label: "Rondônia" },
-  { value: "RR", label: "Roraima" },
-  { value: "SC", label: "Santa Catarina" },
-  { value: "SP", label: "São Paulo" },
-  { value: "SE", label: "Sergipe" },
-  { value: "TO", label: "Tocantins" },
-];
+interface FormClienteProps {
+  /**
+   * Cliente existente para edição. Se não fornecido, o formulário será para criar um novo cliente.
+   */
+  cliente?: Cliente;
+  /**
+   * Callback chamado quando o cliente é criado ou atualizado com sucesso.
+   */
+  onSuccess?: (cliente: Cliente) => void;
+  /**
+   * Callback chamado quando ocorre um erro.
+   */
+  onError?: (error: Error) => void;
+  /**
+   * Se deve resetar o formulário após sucesso. Padrão: true para criação, false para edição.
+   */
+  resetOnSuccess?: boolean;
+  /**
+   * Label do botão de submit. Padrão: baseado no modo (criar/editar).
+   */
+  submitLabel?: string;
+  /**
+   * Label do botão de limpar/resetar. Padrão: "Limpar".
+   */
+  resetLabel?: string;
+  /**
+   * Se deve exibir o botão de limpar. Padrão: true para criação, false para edição.
+   */
+  showResetButton?: boolean;
+}
 
-export default function FormCliente() {
+export default function FormCliente({
+  cliente,
+  onSuccess,
+  onError,
+  resetOnSuccess,
+  submitLabel,
+  resetLabel = "Limpar",
+  showResetButton,
+}: FormClienteProps) {
+  const isEditMode = !!cliente;
+
   const form = useForm<ClienteFormData>({
     resolver: zodResolver(clienteSchema),
     defaultValues: {
-      nome: "",
-      cpf: "",
-      telefone: "",
-      email: "",
-      // O esquema de cliente não tem endereço, então estas são apenas para campos auxiliares se precisar
-      // endereco: { rua: "", numero: "", complemento: "", bairro: "", cidade: "", estado: "", cep: "" },
+      nome: cliente?.nome || "",
+      cpf: cliente?.cpf || "",
+      telefone: cliente?.telefone || "",
+      email: cliente?.email || "",
     },
   });
 
+  // Atualiza o formulário quando o cliente mudar (útil para edição dinâmica)
+  useEffect(() => {
+    if (cliente) {
+      form.reset({
+        nome: cliente.nome,
+        cpf: cliente.cpf || "",
+        telefone: cliente.telefone,
+        email: cliente.email || "",
+      });
+    }
+  }, [cliente, form]);
+
+  // Mutação para criar cliente
   const addClienteMutation = useMutation(
     {
       mutationFn: addCliente,
       onSuccess: (newCliente) => {
-        queryClient.invalidateQueries({ queryKey: ["clientes"] }); // Invalida a lista de clientes
+        queryClient.invalidateQueries({ queryKey: ["clientes"] });
         toast.success("Cliente Cadastrado!", {
           description: `O cliente ${newCliente.nome} foi registrado com sucesso.`,
         });
-        form.reset();
+        if (resetOnSuccess !== false) {
+          form.reset();
+        }
+        onSuccess?.(newCliente);
       },
       onError: (error) => {
         toast.error("Erro no Cadastro", {
@@ -86,38 +111,91 @@ export default function FormCliente() {
             error.message ||
             "Não foi possível registrar o cliente. Tente novamente.",
         });
+        onError?.(error as Error);
       },
     },
-    queryClient
+    queryClient,
   );
 
-  const isLoadingForm = addClienteMutation.isPending;
+  // Mutação para atualizar cliente
+  const updateClienteMutation = useMutation(
+    {
+      mutationFn: updateCliente,
+      onSuccess: (updatedCliente) => {
+        queryClient.invalidateQueries({ queryKey: ["clientes"] });
+        queryClient.invalidateQueries({
+          queryKey: ["cliente", updatedCliente.id],
+        });
+        toast.success("Cliente Atualizado!", {
+          description: `As informações de ${updatedCliente.nome} foram salvas.`,
+        });
+        if (resetOnSuccess === true) {
+          form.reset();
+        }
+        onSuccess?.(updatedCliente);
+      },
+      onError: (error) => {
+        toast.error("Erro na Atualização", {
+          description:
+            error.message ||
+            "Não foi possível salvar as informações. Tente novamente.",
+        });
+        onError?.(error as Error);
+      },
+    },
+    queryClient,
+  );
+
+  const isLoadingForm =
+    addClienteMutation.isPending || updateClienteMutation.isPending;
 
   async function onSubmit(data: ClienteFormData) {
     try {
-      const novoCliente: Cliente = {
-        id: crypto.randomUUID(),
-        ...data,
-        cpf: data.cpf ? data.cpf.replace(/\D/g, "") : undefined,
-        dataCadastro: new Date(),
-        historicoCompras: [],
-        // Endereço não é parte do esquema base de cliente, mas poderia ser adicionado se necessário
-      };
-      addClienteMutation.mutate(novoCliente);
+      if (isEditMode && cliente) {
+        // Modo edição
+        const updatedCliente: Cliente = {
+          ...cliente,
+          ...data,
+          cpf: data.cpf ? data.cpf.replace(/\D/g, "") : undefined,
+        };
+        updateClienteMutation.mutate(updatedCliente);
+      } else {
+        // Modo criação
+        const novoCliente: Cliente = {
+          id: crypto.randomUUID(),
+          ...data,
+          cpf: data.cpf ? data.cpf.replace(/\D/g, "") : undefined,
+          dataCadastro: new Date(),
+          historicoCompras: [],
+        };
+        addClienteMutation.mutate(novoCliente);
+      }
     } catch (error: any) {
       toast.error("Erro na Preparação", {
-        description: error.message || "Ocorreu um erro ao preparar o cliente.",
+        description:
+          error.message ||
+          `Ocorreu um erro ao preparar ${
+            isEditMode ? "a atualização" : "o cadastro"
+          } do cliente.`,
       });
+      onError?.(error as Error);
     }
   }
+
+  const defaultSubmitLabel = isLoadingForm
+    ? isEditMode
+      ? "Salvando..."
+      : "Cadastrando..."
+    : isEditMode
+      ? "Salvar Alterações"
+      : "Cadastrar Cliente";
+  const shouldShowReset =
+    showResetButton !== undefined ? showResetButton : !isEditMode;
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <h2 className="text-2xl font-semibold border-b pb-2 mb-4">
-          Informações do Cliente
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <FormField
             control={form.control}
             name="nome"
@@ -195,22 +273,20 @@ export default function FormCliente() {
           />
         </div>
 
-        {/* NOTA: O schema do cliente não inclui endereço. Se precisar, adicione-o ao clienteSchema */}
-        {/* <h2 className="text-2xl font-semibold border-b pb-2 mb-4 mt-8">Endereço</h2> */}
-        {/* ... campos de endereço ... */}
-
         <div className="flex gap-4 pt-6">
           <Button type="submit" className="flex-1" disabled={isLoadingForm}>
-            {isLoadingForm ? "Cadastrando..." : "Cadastrar Cliente"}
+            {submitLabel || defaultSubmitLabel}
           </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => form.reset()}
-            disabled={isLoadingForm}
-          >
-            Limpar
-          </Button>
+          {shouldShowReset && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => form.reset()}
+              disabled={isLoadingForm}
+            >
+              {resetLabel}
+            </Button>
+          )}
         </div>
       </form>
     </Form>

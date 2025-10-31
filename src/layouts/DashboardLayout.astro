@@ -4,66 +4,21 @@ import BaseLayout from './BaseLayout.astro';
 import Sidebar from '../components/Sidebar';
 
 interface Props {
-  title?: string; // Opcional, será gerado automaticamente
   userType?: 'admin' | 'fornecedor';
 }
 
-const { title, userType = 'admin' } = Astro.props;
+const { userType = 'admin' } = Astro.props;
 
-// Função para gerar título baseado na rota
-function getPageTitleFromRoute(pathname: string): string {
-  // Remove a barra inicial e pega a primeira parte da rota
-  const path = pathname.replace(/^\//, '').split('/')[0];
-  
-  // Mapping de rotas para títulos
-  const routeTitles: Record<string, string> = {
-    '': 'Dashboard',
-    'garimpo': 'Garimpo',
-    'consignacao': 'Consignação',
-    'vendas': 'Vendas',
-    'fornecedores': 'Fornecedores',
-    'clientes': 'Clientes',
-    'relatorios': 'Relatórios',
-    'novo': 'Novo',
-  };
-
-  // Verifica se há segmentos adicionais na rota
-  const segments = pathname.replace(/^\//, '').split('/').filter(Boolean);
-  
-  if (segments.length > 1) {
-    // Se for uma rota dinâmica ou com subcaminhos
-    const lastSegment = segments[segments.length - 1];
-    
-    // Páginas de detalhes
-    if (segments.length === 2 && /^[a-z0-9-]+$/.test(lastSegment)) {
-      const resource = segments[0];
-      const title = routeTitles[resource] || resource;
-      return `Detalhes - ${title}`;
-    }
-    
-    // Páginas "novo"
-    if (lastSegment === 'novo') {
-      const resource = segments[0];
-      return `Novo - ${routeTitles[resource] || resource}`;
-    }
-  }
-  
-  return routeTitles[path] || title || 'Dashboard';
-}
 
 // Obter a rota atual
 const currentPath = Astro.url.pathname;
-const pageTitle = title || getPageTitleFromRoute(currentPath);
 ---
 
-<BaseLayout title={pageTitle}>
+<BaseLayout>
     <div class="flex max-w-[1400px] mx-auto h-screen">
       <Sidebar client:idle userType={userType} />
-      <main class="flex-1 overflow-y-auto">
-        <header class="py-5 mr-4 ps-2 border-neutral-200 dark:border-neutral-700">
-          <h1 class="text-3xl font-bold">{pageTitle}</h1>
-        </header>
-        <section class="p-8 mr-4 h-auto border rounded-3xl bg-white dark:bg-neutral-800">
+      <main class="flex-1 overflow-y-auto ">
+        <section class="p-8 mr-4 h-auto ">
           <slot />
         </section>
       </main>

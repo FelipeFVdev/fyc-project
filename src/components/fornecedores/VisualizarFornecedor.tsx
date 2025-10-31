@@ -1,4 +1,4 @@
-// src/components/fornecedores/VisualizarFornecedor.tsx
+// src/components/fornecedores/HistoricoFornecedor.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -27,11 +27,11 @@ import {
 import { useQuery } from "@tanstack/react-query"; // Hook principal
 import { queryClient } from "@/store";
 
-interface VisualizarFornecedorProps {
+interface HistoricoFornecedorProps {
   fornecedorId: string;
 }
 
-export default function VisualizarFornecedor({
+export default function HistoricoFornecedor({
   fornecedorId,
 }: VisualizarFornecedorProps) {
   // --- BUSCAR O FORNECEDOR ESPECÍFICO ---
@@ -46,7 +46,7 @@ export default function VisualizarFornecedor({
       queryFn: () => getFornecedorById(fornecedorId), // Função de fetch que retorna a Promise
       enabled: !!fornecedorId, // Só busca se fornecedorId for válido
     },
-    queryClient
+    queryClient,
   );
 
   // --- BUSCAR TODOS OS ITENS CONSIGNADOS ---
@@ -59,7 +59,7 @@ export default function VisualizarFornecedor({
       queryKey: ["itensConsignados"],
       queryFn: getItensConsignados,
     },
-    queryClient
+    queryClient,
   );
 
   // --- BUSCAR TODAS AS VENDAS ---
@@ -72,14 +72,14 @@ export default function VisualizarFornecedor({
       queryKey: ["vendas"],
       queryFn: getVendas,
     },
-    queryClient
+    queryClient,
   );
 
   // --- LÓGICA DE CARREGAMENTO GLOBAL ---
   if (isLoadingFornecedor || isLoadingItensConsignados || isLoadingVendas) {
     return (
-      <div className="flex justify-center items-center h-48">
-        <p className="text-xl ">Carregando perfil do fornecedor...</p>
+      <div className="flex h-48 items-center justify-center">
+        <p className="text-xl">Carregando perfil do fornecedor...</p>
       </div>
     );
   }
@@ -98,11 +98,11 @@ export default function VisualizarFornecedor({
       fornecedorExists: !!fornecedor,
     });
     return (
-      <div className="text-center py-10">
-        <h1 className="text-3xl font-bold mb-4">
+      <div className="py-10 text-center">
+        <h1 className="mb-4 text-3xl font-bold">
           Fornecedor não encontrado ou erro.
         </h1>
-        <p className="text-lg ">
+        <p className="text-lg">
           Não foi possível carregar o perfil do fornecedor. Verifique o ID ou
           tente novamente.
         </p>
@@ -118,15 +118,15 @@ export default function VisualizarFornecedor({
 
   // --- Processar dados (agora que sabemos que tudo está carregado e definido) ---
   const itensConsignadosDoFornecedor = (todosItensConsignados || []).filter(
-    (item) => item.fornecedorId === fornecedorId
+    (item) => item.fornecedorId === fornecedorId,
   );
 
   const historicoVendasDoFornecedor = (todasVendas || []).filter((venda) =>
     venda.itens.some((vendaItem) =>
       itensConsignadosDoFornecedor.some(
-        (consignadoItem) => consignadoItem.id === vendaItem.itemId
-      )
-    )
+        (consignadoItem) => consignadoItem.id === vendaItem.itemId,
+      ),
+    ),
   );
 
   // A função handleFornecedorUpdate não é mais usada diretamente aqui,
@@ -170,12 +170,12 @@ export default function VisualizarFornecedor({
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-center mb-8">
+      <div className="mb-8 flex items-center justify-between">
         <div className="space-y-4">
-          <h1 className="text-4xl font-extrabold ">
+          <h1 className="text-4xl font-extrabold">
             Informações do Fornecedor:
           </h1>
-          <p className="text-2xl font-extrabold ">{fornecedor.nome}</p>
+          <p className="text-2xl font-extrabold">{fornecedor.nome}</p>
         </div>
         <div className="flex gap-4">
           <a href={`/fornecedores/extrato/${fornecedor.id}`}>
@@ -205,7 +205,7 @@ export default function VisualizarFornecedor({
             <TableBody>
               {itensConsignadosDoFornecedor.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-4 ">
+                  <TableCell colSpan={7} className="py-4 text-center">
                     Nenhum item consignado para este fornecedor.
                   </TableCell>
                 </TableRow>
@@ -265,7 +265,7 @@ export default function VisualizarFornecedor({
                 <TableRow>
                   <TableCell
                     colSpan={5}
-                    className="text-center py-4 text-neutral-500"
+                    className="py-4 text-center text-neutral-500"
                   >
                     Nenhuma venda registrada para este fornecedor.
                   </TableCell>

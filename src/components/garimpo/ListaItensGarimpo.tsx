@@ -44,7 +44,7 @@ export default function ListaItensGarimpo() {
       queryKey: ["itensGarimpo"],
       queryFn: getItensGarimpo,
     },
-    queryClient
+    queryClient,
   );
 
   // Garantir que 'itens' não é undefined para useMemo
@@ -79,17 +79,17 @@ export default function ListaItensGarimpo() {
         });
       },
     },
-    queryClient
+    queryClient,
   );
 
   const handleAction = (
     itemId: string,
-    action: "excluir" | "editar" | "ver_detalhes"
+    action: "excluir" | "editar" | "ver_detalhes",
   ) => {
     if (action === "excluir") {
       if (
         window.confirm(
-          `Tem certeza que deseja excluir o item ${itemId.substring(0, 8)}?`
+          `Tem certeza que deseja excluir o item ${itemId.substring(0, 8)}?`,
         )
       ) {
         deleteItemMutation.mutate(itemId);
@@ -107,8 +107,8 @@ export default function ListaItensGarimpo() {
   // --- AGORA, AS CONDIÇÕES DE RETORNO PRECOCE (APÓS TODOS OS HOOKS) ---
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-48">
-        <p className="text-xl ">Carregando itens de garimpo...</p>
+      <div className="flex h-48 items-center justify-center">
+        <p className="text-xl">Carregando itens de garimpo...</p>
       </div>
     );
   }
@@ -120,7 +120,7 @@ export default function ListaItensGarimpo() {
       itensExists: !!itens,
     });
     return (
-      <div className="text-center py-8 text-red-600">
+      <div className="py-8 text-center text-red-600">
         Erro ao carregar itens de garimpo.
       </div>
     );
@@ -129,7 +129,7 @@ export default function ListaItensGarimpo() {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold">Gestão de Itens de Garimpo</h1>
         <a href="/garimpo/novo">
           <Button>Novo Item de Garimpo</Button>
@@ -138,12 +138,12 @@ export default function ListaItensGarimpo() {
 
       <div className="flex gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 " />
+          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 bg-white" />
           <Input
             placeholder="Buscar por marca ou categoria..."
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
-            className="pl-9"
+            className="bg-white pl-9"
             disabled={isLoading || deleteItemMutation.isPending}
           />
         </div>
@@ -159,8 +159,8 @@ export default function ListaItensGarimpo() {
               {filtroStatus === "todos"
                 ? "Todos"
                 : filtroStatus === "disponivel"
-                ? "Disponível"
-                : "Vendido"}
+                  ? "Disponível"
+                  : "Vendido"}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
@@ -177,7 +177,7 @@ export default function ListaItensGarimpo() {
         </DropdownMenu>
       </div>
 
-      <div className="border rounded-lg overflow-hidden">
+      <div className="overflow-hidden rounded-lg border bg-white">
         <Table>
           <TableHeader>
             <TableRow>
@@ -195,7 +195,7 @@ export default function ListaItensGarimpo() {
           <TableBody>
             {itensFiltrados.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-8 ">
+                <TableCell colSpan={9} className="py-8 text-center">
                   Nenhum item de garimpo encontrado.
                 </TableCell>
               </TableRow>
