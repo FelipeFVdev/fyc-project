@@ -55,7 +55,7 @@ export default function Sidebar({ userType }: SidebarProps) {
   }, []);
 
   return (
-    <aside className="flex w-64 flex-col justify-between bg-neutral-50 shadow-lg">
+    <aside className="flex w-64 flex-col justify-between rounded-lg bg-neutral-50 shadow-lg 2xl:my-5">
       {/* --- BLOCO DO TÍTULO ESTILIZADO (como na imagem) --- */}
 
       <div className="flex w-full items-center justify-between gap-2 p-4">
@@ -95,8 +95,8 @@ export default function Sidebar({ userType }: SidebarProps) {
               className={cn(
                 "flex items-center gap-3 rounded-lg px-4 py-3 transition-colors",
                 isActive
-                  ? "bg-neutral-300 text-neutral-800 shadow-lg dark:bg-neutral-700 dark:text-white"
-                  : "text-neutral-800 hover:bg-neutral-300 dark:text-neutral-200 dark:hover:bg-neutral-700",
+                  ? "bg-neutral-700 text-neutral-100 shadow-lg dark:bg-neutral-700 dark:text-white"
+                  : "text-neutral-600 hover:bg-neutral-300 dark:text-neutral-200 dark:hover:bg-neutral-700",
               )}
             >
               <Icon className="h-5 w-5" />
@@ -110,7 +110,7 @@ export default function Sidebar({ userType }: SidebarProps) {
         {userType === "admin" && (
           <a
             href="/settings"
-            className="flex items-center gap-3 rounded-lg px-4 py-3 text-neutral-700 transition-colors hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-700"
+            className="flex items-center gap-3 rounded-lg px-4 py-3 text-neutral-600 transition-colors hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-700"
           >
             <Settings className="h-5 w-5" />
             <span className="font-medium">Configurações</span>
