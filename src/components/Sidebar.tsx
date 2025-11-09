@@ -55,7 +55,7 @@ export default function Sidebar({ userType }: SidebarProps) {
   }, []);
 
   return (
-    <aside className="flex w-64 flex-col justify-between rounded-lg bg-neutral-50 shadow-lg 2xl:my-5">
+    <aside className="flex w-64 flex-col justify-between rounded-lg bg-neutral-50 shadow-lg">
       {/* --- BLOCO DO TÍTULO ESTILIZADO (como na imagem) --- */}
 
       <div className="flex w-full items-center justify-between gap-2 p-4">

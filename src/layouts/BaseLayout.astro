@@ -3,7 +3,6 @@
 import "../styles/global.css";
 
 import { Toaster } from "@/components/ui/sonner";
-import ThemeProvider from '@/components/ThemeProvider';
 
 interface Props {
   title?: string;
@@ -23,9 +22,8 @@ const { title = 'FYC', description = 'Sistema de Gestão de Brechó' } = Astro.p
     <link rel="icon" type="image/png" href="/logo-fyc-sem-fundo.png" />
   </head>
   <body class="min-h-screen bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">
-    <ThemeProvider client:idle>
+
       <slot />
       <Toaster client:idle />
-    </ThemeProvider>
   </body>
 </html>

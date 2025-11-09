@@ -18,7 +18,7 @@ const currentPath = Astro.url.pathname;
     <div class="flex max-w-[1400px] mx-auto h-screen">
       <Sidebar client:idle userType={userType} />
       <main class="flex-1 overflow-y-auto ">
-        <section class="p-8 mr-4 h-auto ">
+        <section class="p-8 mr-4 h-auto rounded-lg bg-white shadow-sm">
           <slot />
         </section>
       </main>
